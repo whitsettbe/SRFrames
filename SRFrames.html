@@ -37,23 +37,23 @@ textarea, pre
 <div id="temp" style="display: none;">
 <form>
 	Import from file: <input type="file" id="import" value="" onclick="import()"><br>
-	Export to file: <button id="export">Download</button><a download="refframe.txt.rf" id="exportLink" style="display: none"></a><br>
+	Export to file: <input type="button" value="Download" onclick="fileSave()"><a download="refframe.txt.rf" id="exportLink" style="display: none"></a><br>
 	<br><hr><br>
 	X=displacement, T=time, V=velocity (with respect to c), Lt=light<br>
 	<br>
-	X min: <input type="number" id="xmin" value="-10"> X max: <input type="number" id="xmax" value="10"><br>
-	T min: <input type="number" id="tmin" value="-10"> T max: <input type="number" id="tmax" value="10"><br>
-	&#160&#160&#160ΔX: <input type="number" id="xstep" value="1"> &#160&#160&#160ΔT: <input type="number" id="tstep" value="1"><br>
+	X min: <input type="number" id="xmin" value="-10" step=any> X max: <input type="number" id="xmax" value="10" step=any><br>
+	T min: <input type="number" id="tmin" value="-10" step=any> T max: <input type="number" id="tmax" value="10" step=any><br>
+	&#160&#160&#160ΔX: <input type="number" id="xstep" value="1" step=any> &#160&#160&#160ΔT: <input type="number" id="tstep" value="1" step=any><br>
 	<input type="button" value="Update coordinates" onclick="updateCoord()"><br>
 	<br><hr><br>
-	RF#: <input type="number" id="ref" value="1"><input type="button" value="Load" onclick="load()"><input type="button" value="Save" onclick="save()"> <input type="button" value="Save New" onclick="saveNew()"> <input type="button" value="Pick Frame" onclick="transform()"> <input type="button" value="Remove" onclick="remove()"><br>
+	RF#: <input type="number" id="ref" value="1" step=any><input type="button" value="Load" onclick="load()"><input type="button" value="Save" onclick="save()"> <input type="button" value="Save New" onclick="saveNew()"> <input type="button" value="Pick Frame" onclick="transform()"> <input type="button" value="Remove" onclick="remove()"><br>
 	Intersect: <input type="button" value="X-X&#8320" onclick="intersectXX()"><input type="button" value="X-T&#8320" onclick="intersectXT()"><input type="button" value="T-X&#8320" onclick="intersectTX()"><input type="button" value="T-T&#8320" onclick="intersectTT()"> <input type="button" value="Point coord at frame#" onclick="pointAt()"><br>
 	<br>
-	X: <input type="number" id="xedit" value="0"> T: <input type="number" id="tedit" value="0"> V: <input type="number" id="vedit" value="0"><br>
-	Show tick marks? <input type="checkbox" id="ax" value="Show axes?" checked="true"><br>
+	X: <input type="number" id="xedit" value="0" step=any> T: <input type="number" id="tedit" value="0" step=any> V: <input type="number" id="vedit" value="0" step=any><br>
+	Show tick marks? <input type="checkbox" id="ax" value="Show axes?" checked="true" step=any><br>
 	<br><hr><br>
 	Calculate velocity between two measurements:<br>
-	D1: <input type="number" id="d1" value="0"> D2: <input type="number" id="d2" value="0"> <input type="button" value="Calculate" onclick="calcV()"> V: <input type="number" id="vcalc" value="0"><br>
+	D1: <input type="number" id="d1" value="0" step=any> D2: <input type="number" id="d2" value="0" step=any> <input type="button" value="Calculate" onclick="calcV()"> V: <input type="number" id="vcalc" value="0" step=any><br>
 	<br><hr><br>
 	Precision: <input type="button" value="-" onclick="decimals(-1)"><input type="button" value="+" onclick="decimals(1)"><br>
 </form>
@@ -499,7 +499,7 @@ function pointAt()
 handle exports/imports
 */
 
-//file opener (adapted from https://www.geeksforgeeks.org/how-to-read-a-local-text-file-using-javascript/)
+//file opener
 document.getElementById("import").addEventListener('change', function()
 {
 	var fr=new FileReader();
@@ -544,40 +544,23 @@ document.getElementById("import").addEventListener('change', function()
 
 });
 
-//file save; modified from: http://jsfiddle.net/UselessCode/qm5AG/
-(function ()
+function fileSave()
 {
-	var textFile = null,
-		makeTextFile = function (text) {
-			var data = new Blob([text], {type: 'text/plain'});
-
-			// If we are replacing a previously generated file we need to
-			// manually revoke the object URL to avoid memory leaks.
-			if (textFile !== null) {
-				window.URL.revokeObjectURL(textFile);
-			}
-
-			textFile = window.URL.createObjectURL(data);
-
-			return textFile;
-		};
-
-	var create = document.getElementById("export");
-	create.addEventListener('click', function () {
-		var link = document.getElementById("exportLink");
-		var text = document.getElementById("notes").value + "@\n";
-		text += xMin + " " + xMax + " " + tMin + " " + tMax + " " + xStep + " " + tStep + "\n";
-		text += states.length + "\n";
-		for(var i = 0; i < states.length; i++)
-			text += (axes[i] ? 1 : 0) + " " + toFloat(states[i][0]) + " " + toFloat(states[i][1]) + " " + toFloat(states[i][2]) + " "
-					+ toFloat(edits[i][0]) + " " + toFloat(edits[i][1]) + " " + toFloat(edits[i][2]) + "\n";
-		link.href = makeTextFile(text);
-		link.click();
-	}, false);
-})();
+	var link = document.getElementById("exportLink");
+	var text = document.getElementById("notes").value + "@\n";
+	text += xMin + " " + xMax + " " + tMin + " " + tMax + " " + xStep + " " + tStep + "\n";
+	text += states.length + "\n";
+	for(var i = 0; i < states.length; i++)
+		text += (axes[i] ? 1 : 0) + " " + toFloat(states[i][0]) + " " + toFloat(states[i][1]) + " " + toFloat(states[i][2]) + " "
+				+ toFloat(edits[i][0]) + " " + toFloat(edits[i][1]) + " " + toFloat(edits[i][2]) + "\n";
+	var data = new Blob([text], {type: 'text/plain'});
+	link.href = window.URL.createObjectURL(data);
+	link.click();
+	return false;
+}
 
 /*
-Calculator stuff
+The calculator that should be harder to find...
 */
 
 function calcV()
@@ -588,6 +571,83 @@ function calcV()
 	var mx = Math.max(document.getElementById("d1").value, document.getElementById("d2").value);
 	document.getElementById("vcalc").value = Math.sqrt(1 - (mn * mn) / (mx * mx));
 }
+
+/*
+Mouse interaction
+*/
+
+//mouse parameters
+PT_CLOSE = 20;
+
+//distance from a point (two coords) to a line (two coords per defining point)
+function ptLineDist(x0, y0, x1, y1, x2, y2)
+{
+	return Math.abs((x2 - x1) * (y1 - y0) - (x1 - x0) * (y2 - y1)) / Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+}
+
+//highlight closest frame
+function showClose(event)
+{
+
+	//get closest point
+	var x = event.clientX - canv.offsetLeft;
+	var y = event.clientY - canv.offsetTop;
+	var dist = DIM * 2, close = -1;
+	var r = 0;
+	for(var i = 0; i < states.length; i++)
+	{
+		alert(xMin);
+		r = Math.sqrt(Math.pow(x - xScale(states[i][0]), 2) + Math.pow(t - tScale(states[i][1]), 2));
+		alert(xMin);
+		alert(xMin);//
+		if(xMin < states[i][0])// && states[i][0] < xMax && tMin < states[i][1] && states[i][1] < tMax && r < PT_CLOSE && r < dist)
+		{
+			dist = r;
+			close = i;
+		}
+		alert(i);
+	}
+	alert("c");
+
+	//return if no close enough point, else find closest line
+	if(close == -1) return;
+
+	dist = DIM * 2; closeLn = -1;
+	for(var i = 0; i < states.length; i++)
+	{
+		//try closest x axis
+		r = ptLineDist(x, y, xScale(xMin), tScale(state[1] + state[2] * (xMin - state[0])), xScale(xMax), tScale(state[1] + state[2] * (xMax - state[0])));
+		if(r < dist)
+		{
+			dist = r;
+			closeLn = i;
+		}
+		
+		//try closest t axis
+		r = ptLineDist(x, y, xScale(state[0] + state[2] * (tMin - state[1])), tScale(tMin), xScale(state[0] + state[2] * (tMax - state[1])), tScale(tMax));
+		if(r < dist)
+		{
+			dist = r;
+			closeLn = i;
+		}
+	}
+	
+	//draw highlights
+	alert(closeLn);
+	return;
+}
+
+//on mouse move: highlight closest element
+canv.addEventListener("mousemove", function(event)
+{
+	//get closest point
+	var x = event.clientX - canv.offsetLeft;
+	var y = event.clientY - canv.offsetTop;
+	
+	//highlights
+	showClose(event);
+}, false);
+
 
 redraw();
 relist();
