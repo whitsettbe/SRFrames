@@ -656,13 +656,59 @@ canv.addEventListener("wheel", function(event)
 pointer interaction to emulate mouse
 */
 var pointCache = new Array();
+var prevPtrGap = 0, ptrGap = 0;
 
 //register new pointer
 canv.addEventListener("pointerdown", function(event)
 {
-	alert(event);
+	pointCache.push(event);
 }, false);
-//canv.onpointermove = function(event){alert("hi");}, false);
+
+//update moving pointer
+canv.addEventListener("pointermove", function(event)
+{
+	//keep track of motion in cache
+	for(var i = 0; i < pointCache.length; i++)
+	{
+		if(pointCache[i].pointerId == event.pointerId)
+		{
+			pointCache[i] = event;
+			break;
+		}
+	}
+
+	//given two pointers, create zoomable wheel event
+	if(pointCache.length == 2)
+	{
+		ptrGap = Math.sqrt(Math.pow(pointCache[0].clientX - pointCache[1].clientX, 2) +
+				Math.pow(pointCache[0].clientY - pointCache[1].clientY, 2));
+		zoom(new WheelEvent("wheel", {clientX: (pointCache[0].clientX + pointCache[1].clientX) / 2,
+				clientY: (pointCache[0].clientY + pointCache[1].clientY) / 2}),
+				(ptrGap > prevPtrGap ? 1 : -1));
+		prevPtrGap = ptrGap;
+	}
+}, false);
+
+//unregister removed pointers
+canv.addEventListener("pointerup", function(event)
+{
+	//remove from cache
+	for(var i = 0; i < pointCache.length; i++)
+	{
+		if(pointCache[i].pointerId == event.pointerId)
+		{
+			pointCache.splice(i, 1);
+			break;
+		}
+	}
+
+	//reset pointer gap if necessary
+	if(pointCache.length < 2) prevPtrGap = 0;
+}, false);
+
+/*
+load js elements
+*/
 
 redraw();
 relist();
