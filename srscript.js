@@ -661,7 +661,8 @@ var pointCache = new Array();
 canv.addEventListener("onpointerdown", function(event)
 {
 	alert(event);
-})
+}, false);
+//canv.onpointermove = function(event){alert(event);}, false);
 
 redraw();
 relist();
