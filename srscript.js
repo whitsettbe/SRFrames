@@ -614,7 +614,7 @@ function showClose(event)
 //zoom with given power
 function zoom(event, pwr)
 {
-alert(pwr);
+//alert(pwr);
 	//get mouse coordinates ON GRID
 	var x = xUnscale(event.clientX - canvRect.left);
 	var y = tUnscale(event.clientY - canvRect.top);
