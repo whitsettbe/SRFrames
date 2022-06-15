@@ -658,11 +658,11 @@ pointer interaction to emulate mouse
 var pointCache = new Array();
 
 //register new pointer
-canv.addEventListener("onpointerdown", function(event)
+/*canv.addEventListener("onpointerdown", function(event)
 {
 	alert(event);
-}, false);
-//canv.onpointermove = function(event){alert(event);}, false);
+}, false);*/
+canv.onpointermove = function(event){alert("hi");}, false);
 
 redraw();
 relist();
