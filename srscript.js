@@ -684,7 +684,7 @@ canv.addEventListener("pointermove", function(event)
 				Math.pow(pointCache[0].clientY - pointCache[1].clientY, 2));
 		zoom(new WheelEvent("wheel", {clientX: (pointCache[0].clientX + pointCache[1].clientX) / 2,
 				clientY: (pointCache[0].clientY + pointCache[1].clientY) / 2}),
-				(ptrGap > prevPtrGap ? 1 : -1));
+				(ptrGap > prevPtrGap ? -1 : 1));
 		prevPtrGap = ptrGap;
 	}
 }, false);
