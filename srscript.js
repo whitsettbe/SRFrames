@@ -652,6 +652,17 @@ canv.addEventListener("wheel", function(event)
 	return false;
 }, false);
 
+/*
+pointer interaction to emulate mouse
+*/
+var pointCache = new Array();
+
+//register new pointer
+canv.addEventListener("onpointerdown", function(event)
+{
+	alert(event);
+})
+
 redraw();
 relist();
 load();
