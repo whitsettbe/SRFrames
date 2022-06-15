@@ -37,10 +37,22 @@ function xScale(coord)
 	return Math.round(DIM * (coord - xMin) / (xMax - xMin));
 }
 
+//undo x scale
+function xUnscale(coord)
+{
+	return coord * 1.0 / DIM * (xMax - xMin) + xMin;
+}
+
 //scale for t-axis
 function tScale(coord)
 {
 	return Math.round(DIM * (tMax - coord) / (tMax - tMin));
+}
+
+//undo t scale
+function tUnscale(coord)
+{
+	return tMax - coord * 1.0 / DIM * (tMax - tMin);
 }
 
 //draw point given coordinates
@@ -217,12 +229,12 @@ function updateCoord()
 			toFloat(document.getElementById("xstep").value) > 0 &&
 			toFloat(document.getElementById("tstep").value) > 0)
 	{
-		xMin = document.getElementById("xmin").value;
-		xMax = document.getElementById("xmax").value;
-		tMin = document.getElementById("tmin").value;
-		tMax = document.getElementById("tmax").value;
-		xStep = document.getElementById("xstep").value;
-		tStep = document.getElementById("tstep").value;
+		xMin = toFloat(document.getElementById("xmin").value);
+		xMax = toFloat(document.getElementById("xmax").value);
+		tMin = toFloat(document.getElementById("tmin").value);
+		tMax = toFloat(document.getElementById("tmax").value);
+		xStep = toFloat(document.getElementById("xstep").value);
+		tStep = toFloat(document.getElementById("tstep").value);
 		redraw();
 	}
 	else
@@ -519,7 +531,8 @@ Mouse interaction
 */
 
 //mouse parameters
-PT_CLOSE = 20;
+var PT_CLOSE = 20;
+var ZOOM_FACTOR = 1.03;
 
 //distance from a point (two coords) to a line (two coords per defining point)
 function ptLineDist(x0, y0, x1, y1, x2, y2)
@@ -598,10 +611,29 @@ function showClose(event)
 	return;
 }
 
+//zoom with given power
+function zoom(event, pwr)
+{
+	//get mouse coordinates ON GRID
+	var x = xUnscale(event.clientX - canvRect.left);
+	var y = tUnscale(event.clientY - canvRect.top);
+
+	//adjust boundaries accordingly
+	document.getElementById("xmin").value = x + Math.pow(ZOOM_FACTOR, pwr) *
+			(toFloat(document.getElementById("xmin").value) - x);
+	document.getElementById("xmax").value = x + Math.pow(ZOOM_FACTOR, pwr) *
+			(toFloat(document.getElementById("xmax").value) - x);
+	document.getElementById("tmin").value = y + Math.pow(ZOOM_FACTOR, pwr) *
+			(toFloat(document.getElementById("tmin").value) - y);
+	document.getElementById("tmax").value = y + Math.pow(ZOOM_FACTOR, pwr) *
+			(toFloat(document.getElementById("tmax").value) - y);
+	updateCoord();
+}
+
 //on mouse move: highlight closest element
 canv.addEventListener("mousemove", function(event)
 {
-	//get closest point
+	//get mouse location
 	var x = event.clientX - canvRect.left;
 	var y = event.clientY - canvRect.top;
 
@@ -609,6 +641,16 @@ canv.addEventListener("mousemove", function(event)
 	showClose(event);
 }, false);
 
+//on mouse scroll: zoom on mouse center
+canv.addEventListener("wheel", function(event)
+{
+	//if scroll up (-) zoom in, else zoom out
+	zoom(event, event.deltaY < 0 ? -1 : 1);
+
+	//don't actually scroll
+	event.preventDefault();
+	return false;
+}, false);
 
 redraw();
 relist();
