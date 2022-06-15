@@ -77,6 +77,7 @@ var FRAME_GAP = 50;
 var canv = document.getElementById("myCanvas");
 canv.setAttribute("width", DIM);
 canv.setAttribute("height", DIM);
+var canvRect = canv.getBoundingClientRect();
 var ctx = canv.getContext("2d");
 
 document.getElementById("notes").style.height = window.innerHeight * 0.4 + "px";
@@ -590,33 +591,34 @@ function showClose(event)
 {
 
 	//get closest point
-	var x = event.clientX - canv.offsetLeft;
-	var y = event.clientY - canv.offsetTop;
+	var x = event.clientX - canvRect.left;
+	var y = event.clientY - canvRect.top;
 	var dist = DIM * 2, close = -1;
 	var r = 0;
 	for(var i = 0; i < states.length; i++)
 	{
-		alert(xMin);
-		r = Math.sqrt(Math.pow(x - xScale(states[i][0]), 2) + Math.pow(t - tScale(states[i][1]), 2));
-		alert(xMin);
-		alert(xMin);//
-		if(xMin < states[i][0])// && states[i][0] < xMax && tMin < states[i][1] && states[i][1] < tMax && r < PT_CLOSE && r < dist)
+		//alert([i, x, xScale(states[i][0]), y, tScale(states[i][1])]);
+		r = Math.sqrt(Math.pow(x - xScale(states[i][0]), 2) + Math.pow(y - tScale(states[i][1]), 2));
+		if(xMin < states[i][0] && states[i][0] < xMax && tMin < states[i][1] && states[i][1] < tMax && r < PT_CLOSE && r < dist)
 		{
 			dist = r;
 			close = i;
 		}
-		alert(i);
 	}
-	alert("c");
-
+	
 	//return if no close enough point, else find closest line
 	if(close == -1) return;
-
 	dist = DIM * 2; closeLn = -1;
 	for(var i = 0; i < states.length; i++)
 	{
+		//ensure defined at relevant point
+		if(Math.abs(states[close][0] - states[i][0]) > TOL || Math.abs(states[close][1] - states[i][1]) > TOL)
+		{
+			continue;
+		}
+	
 		//try closest x axis
-		r = ptLineDist(x, y, xScale(xMin), tScale(state[1] + state[2] * (xMin - state[0])), xScale(xMax), tScale(state[1] + state[2] * (xMax - state[0])));
+		r = ptLineDist(x, y, xScale(xMin), tScale(states[i][1] + states[i][2] * (xMin - states[i][0])), xScale(xMax), tScale(states[i][1] + states[i][2] * (xMax - states[i][0])));
 		if(r < dist)
 		{
 			dist = r;
@@ -624,7 +626,7 @@ function showClose(event)
 		}
 		
 		//try closest t axis
-		r = ptLineDist(x, y, xScale(state[0] + state[2] * (tMin - state[1])), tScale(tMin), xScale(state[0] + state[2] * (tMax - state[1])), tScale(tMax));
+		r = ptLineDist(x, y, xScale(states[i][0] + states[i][2] * (tMin - states[i][1])), tScale(tMin), xScale(states[i][0] + states[i][2] * (tMax - states[i][1])), tScale(tMax));
 		if(r < dist)
 		{
 			dist = r;
@@ -641,8 +643,8 @@ function showClose(event)
 canv.addEventListener("mousemove", function(event)
 {
 	//get closest point
-	var x = event.clientX - canv.offsetLeft;
-	var y = event.clientY - canv.offsetTop;
+	var x = event.clientX - canvRect.left;
+	var y = event.clientY - canvRect.top;
 	
 	//highlights
 	showClose(event);
