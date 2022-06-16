@@ -727,6 +727,8 @@ canv.addEventListener("pointermove", function(event)
 	ptrX /= pointerCache.length;
 	ptrY /= pointerCache.length;
 	pan({clientX: ptrX, clientY: ptrY});
+	oldMouseX = ptrX;
+	oldMouseY = ptrY;
 
 }, false);
 
