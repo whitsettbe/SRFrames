@@ -721,7 +721,7 @@ canv.addEventListener("pointermove", function(event)
 
 	//create pannable mouse move event
 	var ptrX = 0, ptrY = 0;
-	for(var i = 0; i < pointerCache.length; i++)
+	for(var i = 0; i < pointCache.length; i++)
 	{
 		ptrX += pointCache[i].clientX;
 		ptrY += pointCache[i].clientY;
