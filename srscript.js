@@ -685,7 +685,7 @@ canv.addEventListener("wheel", function(event)
 pointer interaction to emulate mouse
 */
 var pointCache = new Array();
-var prevPtrGap = 0, ptrGap = 0;
+var prevPtrGap = 0;
 
 //register new pointer
 canv.addEventListener("pointerdown", function(event)
@@ -709,13 +709,25 @@ canv.addEventListener("pointermove", function(event)
 	//given two pointers, create zoomable wheel event
 	if(pointCache.length == 2)
 	{
-		ptrGap = Math.sqrt(Math.pow(pointCache[0].clientX - pointCache[1].clientX, 2) +
+		var ptrGap = Math.sqrt(Math.pow(pointCache[0].clientX - pointCache[1].clientX, 2) +
 				Math.pow(pointCache[0].clientY - pointCache[1].clientY, 2));
 		zoom({clientX: (pointCache[0].clientX + pointCache[1].clientX) / 2,
 				clientY: (pointCache[0].clientY + pointCache[1].clientY) / 2},
 				(ptrGap > prevPtrGap ? -1 : 1));
 		prevPtrGap = ptrGap;
 	}
+
+	//create pannable mouse move event
+	var ptrX = 0, ptrY = 0;
+	for(var i = 0; i < pointerCache.length; i++)
+	{
+		ptrX += pointCache[i].clientX;
+		ptrY += pointCache[i].clientY;
+	}
+	ptrX /= pointerCache.length;
+	ptrY /= pointerCache.length;
+	pan({clientX: ptrX, clientY: ptrY});
+
 }, false);
 
 //unregister removed pointers
