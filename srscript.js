@@ -693,6 +693,17 @@ var prevPtrGap = 0;
 canv.addEventListener("pointerdown", function(event)
 {
 	pointCache.push(event);
+
+	//update center of pointers
+	oldMouseX = 0;
+	oldMouseY = 0;
+	for(var i = 0; i < pointCache.length; i++)
+	{
+		oldMouseX += pointCache[i].clientX;
+		oldMouseY += pointCache[i].clientY;
+	}
+	oldMouseX /= pointCache.length;
+	oldMouseY /= pointCache.length;
 }, false);
 
 //update moving pointer
