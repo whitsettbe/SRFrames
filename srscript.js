@@ -1,4 +1,3 @@
-
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 var DIM = Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.9);
@@ -531,8 +530,10 @@ Mouse interaction
 */
 
 //mouse parameters
+var PAN = 1; //left button
 var PT_CLOSE = 20;
 var ZOOM_FACTOR = 1.03;
+var oldMouseX = 0, oldMouseY = 0;
 
 //distance from a point (two coords) to a line (two coords per defining point)
 function ptLineDist(x0, y0, x1, y1, x2, y2)
@@ -611,10 +612,29 @@ function showClose(event)
 	return;
 }
 
+//pan based on mouse motion
+function pan(event)
+{
+	//get mouse location
+	var x = event.clientX - canvRect.left;
+	var y = event.clientY - canvRect.top;
+	
+	//determine coordinate shift
+	var dx = xUnscale(x) - xUnscale(oldMouseX);
+	var dy = tUnscale(y) - tUnscale(oldMouseY);
+
+	//apply coordinate shift
+	document.getElementById("xmin").value = -dx + toFloat(document.getElementById("xmin").value);
+	document.getElementById("xmax").value = -dx + toFloat(document.getElementById("xmax").value);
+	document.getElementById("tmin").value = -dy + toFloat(document.getElementById("tmin").value);
+	document.getElementById("tmax").value = -dy + toFloat(document.getElementById("tmax").value);
+	updateCoord();
+
+}
+
 //zoom with given power
 function zoom(event, pwr)
 {
-//alert(pwr);
 	//get mouse coordinates ON GRID
 	var x = xUnscale(event.clientX - canvRect.left);
 	var y = tUnscale(event.clientY - canvRect.top);
@@ -631,7 +651,7 @@ function zoom(event, pwr)
 	updateCoord();
 }
 
-//on mouse move: highlight closest element
+//on mouse move: highlight closest element, drag if mouse down
 canv.addEventListener("mousemove", function(event)
 {
 	//get mouse location
@@ -640,6 +660,14 @@ canv.addEventListener("mousemove", function(event)
 
 	//highlights
 	showClose(event);
+
+	//drag panning
+	if(event.buttons & PAN > 0)
+		pan(event);
+		
+	//update most recent location
+	oldMouseX = x;
+	oldMouseY = y;
 }, false);
 
 //on mouse scroll: zoom on mouse center
@@ -703,8 +731,8 @@ canv.addEventListener("pointerup", function(event)
 		}
 	}
 
-	//reset pointer gap if necessary
-	if(pointCache.length < 2) prevPtrGap = 0;
+	//reset pointer gap ALWAYS ~[if necessary]
+	/*if(pointCache.length < 2)*/ prevPtrGap = 0;
 }, false);
 
 /*
