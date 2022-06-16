@@ -711,6 +711,10 @@ canv.addEventListener("pointerdown", function(event)
 //update moving pointer
 canv.addEventListener("pointermove", function(event)
 {
+//stop regular mouse behavior
+//if(pointCache.length == 0)
+//	return;
+alert("problem");
 	//keep track of motion in cache
 	for(var i = 0; i < pointCache.length; i++)
 	{
@@ -761,7 +765,8 @@ canv.addEventListener("pointerup", function(event)
 	}
 
 	//reset pointer gap ALWAYS ~[if necessary]
-	/*if(pointCache.length < 2)*/ prevPtrGap = 0;
+	//if(pointCache.length < 2)
+		prevPtrGap = 0;
 
 	//update center of pointers
 	oldMouseX = 0;
