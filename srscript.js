@@ -728,8 +728,8 @@ canv.addEventListener("pointermove", function(event)
 	}
 	document.getElementById("debug3").value = ptrX;
 	document.getElementById("debug4").value = ptrY;
-	ptrX /= pointerCache.length;
-	ptrY /= pointerCache.length;
+	ptrX /= pointCache.length;
+	ptrY /= pointCache.length;
 	document.getElementById("debug3").value = ptrX;
 	document.getElementById("debug4").value = ptrY;
 	pan({clientX: ptrX, clientY: ptrY});
