@@ -624,6 +624,8 @@ function pan(event)
 	//determine coordinate shift
 	var dx = xUnscale(x) - xUnscale(oldMouseX);
 	var dy = tUnscale(y) - tUnscale(oldMouseY);
+	document.getElementById("debug3").value = x;
+	document.getElementById("debug4").value = y;
 
 	//apply coordinate shift
 	document.getElementById("xmin").value = -dx + toFloat(document.getElementById("xmin").value);
@@ -737,12 +739,8 @@ canv.addEventListener("pointermove", function(event)
 		ptrX += pointCache[i].clientX;
 		ptrY += pointCache[i].clientY;
 	}
-	document.getElementById("debug3").value = ptrX;
-	document.getElementById("debug4").value = ptrY;
 	ptrX /= pointCache.length;
 	ptrY /= pointCache.length;
-	document.getElementById("debug3").value = ptrX;
-	document.getElementById("debug4").value = ptrY;
 	pan({clientX: ptrX, clientY: ptrY});
 	oldMouseX = ptrX;
 	oldMouseY = ptrY;
