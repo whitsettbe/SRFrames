@@ -3,6 +3,11 @@ input[type='number']
 	width: 80px;
 }
 
+input:invalid
+{
+	background-color: pink;
+}
+
 #notes
 {
 	width: 60%;
