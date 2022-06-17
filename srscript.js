@@ -802,7 +802,6 @@ canv.addEventListener("pointerup", function(event)
 
 	//update highlights and finish saving coordinates
 	if(pointCache.length > 0) showClose({clientX: oldMouseX, clientY: oldMouseY});
-	else redraw();
 	oldMouseX -= canvRect.left;
 	oldMouseY -= canvRect.top;
 }, false);
