@@ -534,6 +534,7 @@ var PAN = 1; //left button
 var PT_CLOSE = 20;
 var ZOOM_FACTOR = 1.03;
 var oldMouseX = 0, oldMouseY = 0;
+var mouseMode = false;
 
 //distance from a point (two coords) to a line (two coords per defining point)
 function ptLineDist(x0, y0, x1, y1, x2, y2)
@@ -654,10 +655,12 @@ function zoom(event, pwr)
 			(toFloat(document.getElementById("tmax").value) - y);
 	updateCoord();
 }
-/*
+
 //on mouse move: highlight closest element, drag if mouse down
 canv.addEventListener("mousemove", function(event)
 {
+	mouseMode = true;
+
 	//get mouse location
 	var x = event.clientX - canvRect.left;
 	var y = event.clientY - canvRect.top;
@@ -672,11 +675,13 @@ canv.addEventListener("mousemove", function(event)
 	//update most recent location
 	oldMouseX = x;
 	oldMouseY = y;
-}, false);*/
+}, false);
 
 //on mouse scroll: zoom on mouse center
 canv.addEventListener("wheel", function(event)
 {
+	mouseMode = true;
+
 	//if scroll up (-) zoom in, else zoom out
 	zoom(event, event.deltaY < 0 ? -1 : 1);
 
@@ -694,6 +699,10 @@ var prevPtrGap = 0;
 //register new pointer
 canv.addEventListener("pointerdown", function(event)
 {
+	//prevent mouse confusion
+	if(mouseMode) return;
+	event.preventDefault();
+
 	pointCache.push(event);
 
 	//update center of pointers
@@ -706,6 +715,9 @@ canv.addEventListener("pointerdown", function(event)
 	}
 	oldMouseX /= pointCache.length;
 	oldMouseY /= pointCache.length;
+
+	//update highlights and finish saving coordinates
+	showClose({clientX: oldMouseX, clientY: oldMouseY});
 	oldMouseX -= canvRect.left;
 	oldMouseY -= canvRect.top;
 }, false);
@@ -713,10 +725,11 @@ canv.addEventListener("pointerdown", function(event)
 //update moving pointer
 canv.addEventListener("pointermove", function(event)
 {
-//stop regular mouse behavior
-//if(pointCache.length == 0)
-//	return;
-//alert(pointCache.length);
+	//prevent mouse confusion
+	if(mouseMode) return;
+	if(pointCache.length == 0) return;
+	event.preventDefault();
+
 	//keep track of motion in cache
 	for(var i = 0; i < pointCache.length; i++)
 	{
@@ -726,24 +739,6 @@ canv.addEventListener("pointermove", function(event)
 			break;
 		}
 	}
-
-/*
-	if(pointCache.length == 0)
-	{
-		pointCache.push(event);
-		oldMouseX = 0;
-		oldMouseY = 0;
-		for(var i = 0; i < pointCache.length; i++)
-		{
-			oldMouseX += pointCache[i].clientX;
-			oldMouseY += pointCache[i].clientY;
-		}
-		oldMouseX /= pointCache.length;
-		oldMouseY /= pointCache.length;
-		oldMouseX -= canvRect.left;
-		oldMouseY -= canvRect.top;
-	}*/
-//alert(pointCache.length);
 
 	//given two pointers, create zoomable wheel event
 	if(pointCache.length == 2)
@@ -766,6 +761,9 @@ canv.addEventListener("pointermove", function(event)
 	ptrX /= pointCache.length;
 	ptrY /= pointCache.length;
 	pan({clientX: ptrX, clientY: ptrY});
+
+	//update highlights and finish saving coordinates
+	showClose({clientX: ptrX, clientY: ptrY});
 	oldMouseX = ptrX - canvRect.left;
 	oldMouseY = ptrY - canvRect.top;
 
@@ -774,6 +772,10 @@ canv.addEventListener("pointermove", function(event)
 //unregister removed pointers
 canv.addEventListener("pointerup", function(event)
 {
+	//prevent mouse confusion
+	if(mouseMode) return;
+	event.preventDefault();
+
 	//remove from cache
 	for(var i = 0; i < pointCache.length; i++)
 	{
@@ -784,9 +786,8 @@ canv.addEventListener("pointerup", function(event)
 		}
 	}
 
-	//reset pointer gap ALWAYS ~[if necessary]
-	//if(pointCache.length < 2)
-		prevPtrGap = 0;
+	//reset pointer gap ALWAYS
+	prevPtrGap = 0;
 
 	//update center of pointers
 	oldMouseX = 0;
@@ -798,6 +799,10 @@ canv.addEventListener("pointerup", function(event)
 	}
 	oldMouseX /= pointCache.length;
 	oldMouseY /= pointCache.length;
+
+	//update highlights and finish saving coordinates
+	if(pointCache.length > 0) showClose({clientX: oldMouseX, clientY: oldMouseY});
+	else redraw();
 	oldMouseX -= canvRect.left;
 	oldMouseY -= canvRect.top;
 }, false);
