@@ -618,14 +618,14 @@ function pan(event)
 	//get mouse location
 	var x = event.clientX - canvRect.left;
 	var y = event.clientY - canvRect.top;
-	document.getElementById("debug1").value = x;
-	document.getElementById("debug2").value = y;
+	//document.getElementById("debug1").value = x;
+	//document.getElementById("debug2").value = y;
 	
 	//determine coordinate shift
 	var dx = xUnscale(x) - xUnscale(oldMouseX);
 	var dy = tUnscale(y) - tUnscale(oldMouseY);
-	document.getElementById("debug3").value = x;
-	document.getElementById("debug4").value = y;
+	document.getElementById("debug3").value = dx;
+	document.getElementById("debug4").value = dy;
 
 	//apply coordinate shift
 	document.getElementById("xmin").value = -dx + toFloat(document.getElementById("xmin").value);
@@ -654,7 +654,7 @@ function zoom(event, pwr)
 			(toFloat(document.getElementById("tmax").value) - y);
 	updateCoord();
 }
-
+/*
 //on mouse move: highlight closest element, drag if mouse down
 canv.addEventListener("mousemove", function(event)
 {
@@ -672,7 +672,7 @@ canv.addEventListener("mousemove", function(event)
 	//update most recent location
 	oldMouseX = x;
 	oldMouseY = y;
-}, false);
+}, false);*/
 
 //on mouse scroll: zoom on mouse center
 canv.addEventListener("wheel", function(event)
@@ -706,6 +706,8 @@ canv.addEventListener("pointerdown", function(event)
 	}
 	oldMouseX /= pointCache.length;
 	oldMouseY /= pointCache.length;
+	oldMouseX -= canvRect.left;
+	oldMouseY -= canvRect.top;
 }, false);
 
 //update moving pointer
@@ -714,7 +716,7 @@ canv.addEventListener("pointermove", function(event)
 //stop regular mouse behavior
 //if(pointCache.length == 0)
 //	return;
-alert("problem");
+//alert(pointCache.length);
 	//keep track of motion in cache
 	for(var i = 0; i < pointCache.length; i++)
 	{
@@ -724,6 +726,24 @@ alert("problem");
 			break;
 		}
 	}
+
+/*
+	if(pointCache.length == 0)
+	{
+		pointCache.push(event);
+		oldMouseX = 0;
+		oldMouseY = 0;
+		for(var i = 0; i < pointCache.length; i++)
+		{
+			oldMouseX += pointCache[i].clientX;
+			oldMouseY += pointCache[i].clientY;
+		}
+		oldMouseX /= pointCache.length;
+		oldMouseY /= pointCache.length;
+		oldMouseX -= canvRect.left;
+		oldMouseY -= canvRect.top;
+	}*/
+//alert(pointCache.length);
 
 	//given two pointers, create zoomable wheel event
 	if(pointCache.length == 2)
@@ -746,8 +766,8 @@ alert("problem");
 	ptrX /= pointCache.length;
 	ptrY /= pointCache.length;
 	pan({clientX: ptrX, clientY: ptrY});
-	oldMouseX = ptrX;
-	oldMouseY = ptrY;
+	oldMouseX = ptrX - canvRect.left;
+	oldMouseY = ptrY - canvRect.top;
 
 }, false);
 
@@ -778,6 +798,8 @@ canv.addEventListener("pointerup", function(event)
 	}
 	oldMouseX /= pointCache.length;
 	oldMouseY /= pointCache.length;
+	oldMouseX -= canvRect.left;
+	oldMouseY -= canvRect.top;
 }, false);
 
 /*
