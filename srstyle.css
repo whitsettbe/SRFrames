@@ -1,4 +1,4 @@
-input[type='number']
+input[type='text'], input[type='number']
 {
 	width: 80px;
 }
