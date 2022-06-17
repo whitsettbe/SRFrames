@@ -619,14 +619,10 @@ function pan(event)
 	//get mouse location
 	var x = event.clientX - canvRect.left;
 	var y = event.clientY - canvRect.top;
-	//document.getElementById("debug1").value = x;
-	//document.getElementById("debug2").value = y;
 	
 	//determine coordinate shift
 	var dx = xUnscale(x) - xUnscale(oldMouseX);
 	var dy = tUnscale(y) - tUnscale(oldMouseY);
-	document.getElementById("debug3").value = dx;
-	document.getElementById("debug4").value = dy;
 
 	//apply coordinate shift
 	document.getElementById("xmin").value = -dx + toFloat(document.getElementById("xmin").value);

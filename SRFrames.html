@@ -24,7 +24,7 @@
 	<br><hr><br>
 	X=displacement, T=time, V=velocity (with respect to c), Lt=light<br>
 	<br>
-	X min: <input type="number" id="xmin" value="-10" step=any> X max: <input type="number" id="xmax" value="10" step=any><br>
+	X min: <input type="number" id="xmin" value="-10" step=any pattern="[-,0-9]+" required> X max: <input type="number" id="xmax" value="10" step=any><br>
 	T min: <input type="number" id="tmin" value="-10" step=any> T max: <input type="number" id="tmax" value="10" step=any><br>
 	&#160&#160&#160ΔX: <input type="number" id="xstep" value="1" step=any> &#160&#160&#160ΔT: <input type="number" id="tstep" value="1" step=any><br>
 	<input type="button" value="Update coordinates" onclick="updateCoord()"><br>
@@ -43,11 +43,11 @@
 <p id="states"></p>
 </div>
 <hr>
-<input type="number" id="debug1" value="0" step=any>
+<!--<input type="number" id="debug1" value="0" step=any>
 <input type="number" id="debug2" value="0" step=any>
 <input type="number" id="debug3" value="0" step=any>
-<input type="number" id="debug4" value="0" step=any><br>
-<textarea id="notes">Notes...5:19pm</textarea>
+<input type="number" id="debug4" value="0" step=any><br>-->
+<textarea id="notes">Notes...5:55pm</textarea>
 <script src="srscript.js"></script>
 </body>
 </html>
