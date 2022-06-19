@@ -697,7 +697,7 @@ canv.addEventListener("mousedown", function(event)
 canv.addEventListener("wheel", function(event)
 {
 	mouseMode = true;
-
+alert(event.deltaMode);
 	//if scroll up (-) zoom in, else zoom out
 	zoom(event, event.deltaY < 0 ? -1 : 1);
 
