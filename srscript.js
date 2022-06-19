@@ -246,7 +246,7 @@ function updateCoord()
 function decimals(change)
 {
 	numDec += change;
-	numDec = Math.max(numDec, 1);
+	numDec = Math.min(Math.max(numDec, 1), 15);
 	relist();
 }
 
