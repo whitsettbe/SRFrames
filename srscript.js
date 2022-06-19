@@ -33,7 +33,7 @@ handle coordinate transforms and drawing
 //scale for x-axis
 function xScale(coord)
 {
-	return Math.round(DIM * (coord - xMin) / (xMax - xMin));
+	return (DIM * (coord - xMin) / (xMax - xMin));
 }
 
 //undo x scale
@@ -45,7 +45,7 @@ function xUnscale(coord)
 //scale for t-axis
 function tScale(coord)
 {
-	return Math.round(DIM * (tMax - coord) / (tMax - tMin));
+	return (DIM * (tMax - coord) / (tMax - tMin));
 }
 
 //undo t scale
@@ -543,7 +543,7 @@ Mouse interaction
 
 //mouse parameters
 var LEFT = 1; //left button
-var PT_CLOSE = 40;
+var PT_CLOSE = 60;
 var ZOOM_FACTOR = 1.03;
 var oldMouseX = 0, oldMouseY = 0;
 var mouseMode = false;
@@ -610,21 +610,8 @@ function showClose(event)
 
 	//set dropdown selection and redraw
 	document.getElementById("ref").value = closeLn + 1;
+	load();
 	redraw();
-
-	/*//save old line settings
-	var oldLineWidth = ctx.lineWidth;
-	var oldStrokeStyle = ctx.strokeStyle
-
-	//redraw and load new line settings
-	redraw();
-	ctx.lineWidth *= 2;
-	ctx.strokeStyle = "#FF0000";
-
-	//highlight (see redraw()) and reset line settings
-	draw(states[closeLn], true, true, true, false, axes[closeLn]);
-	ctx.lineWidth = oldLineWidth;
-	ctx.strokeStyle = oldStrokeStyle;*/
 	return;
 }
 
@@ -699,8 +686,7 @@ canv.addEventListener("mousedown", function(event)
 	var y = event.clientY - canvRect.top;
 
 	//highlights
-	if(event.buttons & LEFT > 0)
-		showClose(event);
+	showClose(event);
 
 	//update most recent location
 	oldMouseX = x;
