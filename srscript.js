@@ -165,11 +165,23 @@ var axes = [true, true];
 function redraw()
 {
 	ctx.clearRect(0, 0, canv.width, canv.height);
+	var oldLineWidth = ctx.lineWidth;
+	var oldStrokeStyle = ctx.strokeStyle
+
+	//redraw usual frames
 	for(var i = 0; i < states.length; i ++)
 	{
 		draw(states[i], true, true, true, false, axes[i]);
 	}
 	drawLight([0, 0, 0]);
+
+	//load special settings, draw highlighted frame, and reset
+	ctx.lineWidth *= 2;
+	ctx.strokeStyle = "#FF0000";
+	draw(states[parseInt(document.getElementById("ref").value) - 1], true, true, true, false,
+			axes[parseInt(document.getElementById("ref").value) - 1]);
+	ctx.lineWidth = oldLineWidth;
+	ctx.strokeStyle = oldStrokeStyle;
 }
 
 //convert any type to float, rounding off insignificant bits
@@ -530,7 +542,7 @@ Mouse interaction
 */
 
 //mouse parameters
-var PAN = 1; //left button
+var LEFT = 1; //left button
 var PT_CLOSE = 20;
 var ZOOM_FACTOR = 1.03;
 var oldMouseX = 0, oldMouseY = 0;
@@ -545,7 +557,6 @@ function ptLineDist(x0, y0, x1, y1, x2, y2)
 //highlight closest frame
 function showClose(event)
 {
-
 	//get closest point
 	var x = event.clientX - canvRect.left;
 	var y = event.clientY - canvRect.top;
@@ -597,7 +608,11 @@ function showClose(event)
 		}
 	}
 
-	//save old line settings
+	//set dropdown selection and redraw
+	document.getElementById("ref").value = closeLn + 1;
+	redraw();
+
+	/*//save old line settings
 	var oldLineWidth = ctx.lineWidth;
 	var oldStrokeStyle = ctx.strokeStyle
 
@@ -609,7 +624,7 @@ function showClose(event)
 	//highlight (see redraw()) and reset line settings
 	draw(states[closeLn], true, true, true, false, axes[closeLn]);
 	ctx.lineWidth = oldLineWidth;
-	ctx.strokeStyle = oldStrokeStyle;
+	ctx.strokeStyle = oldStrokeStyle;*/
 	return;
 }
 
@@ -661,13 +676,32 @@ canv.addEventListener("mousemove", function(event)
 	var x = event.clientX - canvRect.left;
 	var y = event.clientY - canvRect.top;
 
-	//highlights
-	showClose(event);
-
 	//drag panning
-	if(event.buttons & PAN > 0)
+	if(event.buttons & LEFT > 0)
 		pan(event);
-		
+
+	//highlights
+	if(event.buttons & LEFT > 0)
+		showClose(event);
+
+	//update most recent location
+	oldMouseX = x;
+	oldMouseY = y;
+}, false);
+
+//on mouse down: (mouse move behavior)
+canv.addEventListener("mousedown", function(event)
+{
+	mouseMode = true;
+
+	//get mouse location
+	var x = event.clientX - canvRect.left;
+	var y = event.clientY - canvRect.top;
+
+	//highlights
+	if(event.buttons & LEFT > 0)
+		showClose(event);
+
 	//update most recent location
 	oldMouseX = x;
 	oldMouseY = y;

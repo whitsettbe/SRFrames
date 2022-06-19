@@ -32,7 +32,7 @@
 			<input type="text" id="tstep" value="1" pattern="[.0-9]+" required><br>
 	<input type="button" value="Update coordinates" onclick="updateCoord()"><br>
 	<br><hr><br>
-	RF#: <input type="number" id="ref" value="1" min="1" required><input
+	RF#: <input type="number" id="ref" value="1" min="1" pattern="[0-9]+" required><input
 			type="button" value="Load" onclick="load()"><input type="button" value="Save" onclick="save()"> <input
 			type="button" value="Save New" onclick="saveNew()"> <input
 			type="button" value="Pick Frame" onclick="transform()"> <input
@@ -60,7 +60,7 @@
 <p id="states"></p>
 </div>
 <hr>
-<textarea id="notes">Notes...6:55pm</textarea>
+<textarea id="notes">Notes...8:28am</textarea>
 <script src="srscript.js"></script>
 </body>
 </html>
