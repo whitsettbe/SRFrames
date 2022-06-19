@@ -544,7 +544,7 @@ Mouse interaction
 //mouse parameters
 var LEFT = 1; //left button
 var PT_CLOSE = 60;
-var ZOOM_FACTOR = 1.03;
+var ZOOM_FACTOR = 1.05;
 var oldMouseX = 0, oldMouseY = 0;
 var mouseMode = false;
 
@@ -697,7 +697,7 @@ canv.addEventListener("mousedown", function(event)
 canv.addEventListener("wheel", function(event)
 {
 	mouseMode = true;
-alert(event.deltaMode);
+//alert(event.deltaMode);
 	//if scroll up (-) zoom in, else zoom out
 	zoom(event, event.deltaY < 0 ? -1 : 1);
 
