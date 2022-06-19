@@ -544,7 +544,7 @@ Mouse interaction
 //mouse parameters
 var LEFT = 1; //left button
 var PT_CLOSE = 60;
-var ZOOM_FACTOR = 1.05;
+var ZOOM_FACTOR = 1.07;
 var oldMouseX = 0, oldMouseY = 0;
 var mouseMode = false;
 
