@@ -546,7 +546,8 @@ var LEFT = 1; //left button
 var PT_CLOSE = 60;
 var ZOOM_FACTOR = 1.07;
 var oldMouseX = 0, oldMouseY = 0;
-var mouseMode = false;
+var mouseMode = 0;
+var MOUSE_TIMEOUT = 1000;
 
 //distance from a point (two coords) to a line (two coords per defining point)
 function ptLineDist(x0, y0, x1, y1, x2, y2)
@@ -657,7 +658,7 @@ function zoom(event, pwr)
 //on mouse move: highlight closest element, drag if mouse down
 canv.addEventListener("mousemove", function(event)
 {
-	mouseMode = true;
+	mouseMode = (new Date()).getTime();
 
 	//get mouse location
 	var x = event.clientX - canvRect.left;
@@ -679,7 +680,7 @@ canv.addEventListener("mousemove", function(event)
 //on mouse down: (mouse move behavior)
 canv.addEventListener("mousedown", function(event)
 {
-	mouseMode = true;
+	mouseMode = (new Date()).getTime();
 
 	//get mouse location
 	var x = event.clientX - canvRect.left;
@@ -696,7 +697,7 @@ canv.addEventListener("mousedown", function(event)
 //on mouse scroll: zoom on mouse center
 canv.addEventListener("wheel", function(event)
 {
-	mouseMode = true;
+	mouseMode = (new Date()).getTime();
 //alert(event.deltaMode);
 	//if scroll up (-) zoom in, else zoom out
 	zoom(event, event.deltaY < 0 ? -1 : 1);
@@ -716,7 +717,7 @@ var prevPtrGap = 0;
 canv.addEventListener("pointerdown", function(event)
 {
 	//prevent mouse confusion
-	if(mouseMode) return;
+	if((new Date()).getTime() - mouseMode < MOUSE_TIMEOUT) return;
 	event.preventDefault();
 
 	pointCache.push(event);
@@ -742,7 +743,7 @@ canv.addEventListener("pointerdown", function(event)
 canv.addEventListener("pointermove", function(event)
 {
 	//prevent mouse confusion
-	if(mouseMode) return;
+	if((new Date()).getTime() - mouseMode < MOUSE_TIMEOUT) return;
 	if(pointCache.length == 0) return;
 	event.preventDefault();
 
@@ -763,7 +764,7 @@ canv.addEventListener("pointermove", function(event)
 				Math.pow(pointCache[0].clientY - pointCache[1].clientY, 2));
 		zoom({clientX: (pointCache[0].clientX + pointCache[1].clientX) / 2,
 				clientY: (pointCache[0].clientY + pointCache[1].clientY) / 2},
-				(ptrGap > prevPtrGap ? -1 : 1));
+				Math.log(prevPtrGap / ptrGap) / Math.log(ZOOM_FACTOR));
 		prevPtrGap = ptrGap;
 	}
 
@@ -789,7 +790,7 @@ canv.addEventListener("pointermove", function(event)
 canv.addEventListener("pointerup", function(event)
 {
 	//prevent mouse confusion
-	if(mouseMode) return;
+	if((new Date()).getTime() - mouseMode < MOUSE_TIMEOUT) return;
 	event.preventDefault();
 
 	//remove from cache
