@@ -762,7 +762,7 @@ canv.addEventListener("pointermove", function(event)
 	{
 		var ptrGap = Math.sqrt(Math.pow(pointCache[0].clientX - pointCache[1].clientX, 2) +
 				Math.pow(pointCache[0].clientY - pointCache[1].clientY, 2));
-		alert([prevPtrGap, ptrGap, Math.log(prevPtrGap / ptrGap), Math.log(prevPtrGap / ptrGap) / Math.log(ZOOM_FACTOR))]);
+		alert([prevPtrGap, ptrGap, Math.log(prevPtrGap / ptrGap), Math.log(prevPtrGap / ptrGap) / Math.log(ZOOM_FACTOR)]);
 		zoom({clientX: (pointCache[0].clientX + pointCache[1].clientX) / 2,
 				clientY: (pointCache[0].clientY + pointCache[1].clientY) / 2},
 				Math.log(prevPtrGap / ptrGap) / Math.log(ZOOM_FACTOR));
