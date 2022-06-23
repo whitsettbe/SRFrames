@@ -373,6 +373,8 @@ function remove()
 		states.splice(idx, 1);
 		edits.splice(idx, 1);
 		ticks.splice(idx, 1);
+		if(idx >= states.length)
+			document.getElementById("ref").value = idx - 1;
 		redraw();
 		relist();
 	}
@@ -874,72 +876,98 @@ function intersect()
 	interval = setInterval(function()
 	{
 		checkSpecial();
-		if(special.length >= 2)
+		if(special.length < 2) return;
+		clearInterval(interval);
+		//continue
+		//...
+
+		oldLen = states.length;
+		//try x-x intersect
+		newLocs = [];
+		if(Math.abs(states[special[0]][2] - states[special[1]][2]) > TOL)
 		{
+			newLocs.push(linSolve(states[special[0]][0], states[special[0]][1], states[special[0]][2],
+					states[special[1]][0], states[special[1]][1], states[special[1]][2]));
+		}
+
+		//try x-t intersect
+		newLocs.push(linSolve(states[special[0]][0], states[special[0]][1], states[special[0]][2],
+				states[special[1]][0], states[special[1]][1],
+				(Math.abs(states[special[1]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[1]][2])));
+
+		//try t-x intersect
+		//alert([states[special[0]][0], states[special[0]][1],
+		//		(states[special[0]][2] < TOL ? 1 / TOL / TOL : 1 / states[special[0]][2]),
+		//		states[special[1]][0], states[special[1]][1], states[special[1]][2]].join('\n'));
+		newLocs.push(linSolve(states[special[0]][0], states[special[0]][1],
+				(Math.abs(states[special[0]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[0]][2]),
+				states[special[1]][0], states[special[1]][1], states[special[1]][2]));
+		//alert(special.join());
+
+		//try t-t intersect
+		if(Math.abs(states[special[0]][2] - states[special[1]][2]) > TOL)
+		{
+			newLocs.push(linSolve(states[special[0]][0], states[special[0]][1],
+					(Math.abs(states[special[0]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[0]][2]),
+					states[special[1]][0], states[special[1]][1],
+					(Math.abs(states[special[1]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[1]][2])));
+		}
+//alert([special, states[0], states[1], newLocs].join('\n'));
+		//add new intersect frames (temporarily)
+		for(var i = 0; i < newLocs.length; i++)
+		{
+			for(var j = 0; j < 2; j++)
+			{
+				//check for newness
+				var old = false;
+				for(var k = 0; k < states.length; k++)
+				{
+					if(Math.abs(states[k][0] - newLocs[i][0]) < TOL &&
+							Math.abs(states[k][1] - newLocs[i][1]) < TOL &&
+							Math.abs(states[k][2] - states[special[j]][2]) < TOL)
+					{
+						old = true;
+					}
+				}
+				if(!old)
+				{
+					states.push(newLocs[i].concat([states[special[j]][2]]));
+					edits.push(newLocs[i].concat([states[special[j]][2]]));
+					ticks.push(false);
+				}
+			}
+		}
+		redraw();
+
+		//wait for a new frame to be selected (@@only new frames can be selected; there may be none)
+		interval = setInterval(function()
+		{
+			checkSpecial();
+			if(special.length < 3) return;
+			if(special[2] < oldLen)
+			{
+				special.splice(2);
+				return;
+			}
+			//@@confirmation button?
 			clearInterval(interval);
 			//continue
 			//...
 
-			oldLen = states.length;
-			//try x-x intersect
-			newLocs = [];
-			if(Math.abs(states[special[0]][2] - states[special[1]][2]) > TOL)
-			{
-				newLocs.push(linSolve(states[special[0]][0], states[special[0]][1], states[special[0]][2],
-						states[special[1]][0], states[special[1]][1], states[special[1]][2]));
-			}
+			//save the selected frame and delete others
+			[states[oldLen], states[special[2]]] = [states[special[2]], states[oldLen]];
+			[edits[oldLen], edits[special[2]]] = [edits[special[2]], edits[oldLen]];
+			[ticks[oldLen], ticks[special[2]]] = [ticks[special[2]], ticks[oldLen]];
+			states.splice(oldLen + 1);
+			edits.splice(oldLen + 1);
+			ticks.splice(oldLen + 1);
 
-			//try x-t intersect
-			newLocs.push(linSolve(states[special[0]][0], states[special[0]][1], states[special[0]][2],
-					states[special[1]][0], states[special[1]][1],
-					(Math.abs(states[special[1]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[1]][2])));
-
-			//try t-x intersect
-			//alert([states[special[0]][0], states[special[0]][1],
-			//		(states[special[0]][2] < TOL ? 1 / TOL / TOL : 1 / states[special[0]][2]),
-			//		states[special[1]][0], states[special[1]][1], states[special[1]][2]].join('\n'));
-			newLocs.push(linSolve(states[special[0]][0], states[special[0]][1],
-					(Math.abs(states[special[0]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[0]][2]),
-					states[special[1]][0], states[special[1]][1], states[special[1]][2]));
-			//alert(special.join());
-
-			//try t-t intersect
-			if(Math.abs(states[special[0]][2] - states[special[1]][2]) > TOL)
-			{
-				newLocs.push(linSolve(states[special[0]][0], states[special[0]][1],
-						(Math.abs(states[special[0]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[0]][2]),
-						states[special[1]][0], states[special[1]][1],
-						(Math.abs(states[special[1]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[1]][2])));
-			}
-//alert([special, states[0], states[1], newLocs].join('\n'));
-			//add new intersect frames (temporarily)
-			for(var i = 0; i < newLocs.length; i++)
-			{
-				for(var j = 0; j < 2; j++)
-				{
-					//check for newness
-					var old = false;
-					for(var k = 0; k < states.length; k++)
-					{
-						if(Math.abs(states[k][0] - newLocs[i][0]) < TOL &&
-								Math.abs(states[k][1] - newLocs[i][1]) < TOL &&
-								Math.abs(states[k][2] - states[special[j]][2]) < TOL)
-						{
-							old = true;
-						}
-					}
-					if(!old)
-					{
-						states.push(newLocs[i].concat([states[special[j]][2]]));
-						edits.push(newLocs[i].concat([states[special[j]][2]]));
-						ticks.push(false);
-					}
-				}
-			}
+			//clear special and redraw
+			document.getElementById("ref").value = oldLen + 1;
+			special.splice(0);
 			redraw();
-
-			//@@
-		}
+			relist();
+		})
 	}, 250);
 }
 
