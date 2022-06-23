@@ -19,16 +19,19 @@
 </table>
 <div id="temp" style="display: none;">
 <form>
+	<input type="button" value="Intersect" onclick="intersect()">
+	<br>
+	<br>
 	Import from file: <input type="file" id="import" value="" onclick="import()"><br>
 	Export to file: <input type="button" value="Download" onclick="fileSave()"><a download="refframe.txt.rf" id="exportLink" style="display: none"></a><br>
 	<br><hr><br>
 	X=displacement, T=time, V=velocity (with respect to c), Lt=light<br>
 	<br>
-	X min: <input type="text" id="xmin" value="-10" pattern="[-.0-9]+" required> X max:
-			<input type="text" id="xmax" value="10" pattern="[-.0-9]+" required><br>
-	T min: <input type="text" id="tmin" value="-10" pattern="[-.0-9]+" required> T max:
-			<input type="text" id="tmax" value="10" pattern="[-.0-9]+" required><br>
-	&#160&#160&#160ΔX: <input type="text" id="xstep" value="1" pattern="[.0-9]+" required> &#160&#160&#160ΔT:
+	X min: <input type="text" id="xmin" value="-10" pattern="[-.0-9e]+" required> X max:
+			<input type="text" id="xmax" value="10" pattern="[-.0-9e]+" required><br>
+	T min: <input type="text" id="tmin" value="-10" pattern="[-.0-9e]+" required> T max:
+			<input type="text" id="tmax" value="10" pattern="[-.0-9e]+" required><br>
+	&#160&#160&#160ΔX: <input type="text" id="xstep" value="1" pattern="[.0-9e]+" required> &#160&#160&#160ΔT:
 			<input type="text" id="tstep" value="1" pattern="[.0-9]+" required><br>
 	<input type="button" value="Update coordinates" onclick="updateCoord()"><br>
 	<br><hr><br>
@@ -43,16 +46,16 @@
 			type="button" value="T-T&#8320" onclick="intersectTT()"> <input
 			type="button" value="Point coord at frame#" onclick="pointAt()"><br>
 	<br>
-	X: <input type="text" id="xedit" value="0" pattern="[-.0-9]+" required> T: <input
-			type="text" id="tedit" value="0" pattern="[-.0-9]+" required> V: <input
-			type="text" id="vedit" value="0" pattern="[-.0-9]+" required><br>
+	X: <input type="text" id="xedit" value="0" pattern="[-.0-9e]+" required> T: <input
+			type="text" id="tedit" value="0" pattern="[-.0-9e]+" required> V: <input
+			type="text" id="vedit" value="0" pattern="[-.0-9e]+" required><br>
 	Show tick marks? <input type="checkbox" id="ax" value="Show axes?" checked="true"><br>
 	<br><hr><br>
 	Calculate velocity between two measurements:<br>
-	D1: <input type="text" id="d1" value="0" pattern="[.0-9]*"> D2: <input
-			type="text" id="d2" value="0" pattern="[.0-9]*"> <input
+	D1: <input type="text" id="d1" value="0" pattern="[.0-9e]*"> D2: <input
+			type="text" id="d2" value="0" pattern="[.0-9e]*"> <input
 			type="button" value="Calculate" onclick="calcV()"> V: <input
-			type="text" id="vcalc" value="0" pattern="[.0-9]*" disabled><br>
+			type="text" id="vcalc" value="0" pattern="[.0-9e]*" disabled><br>
 	<br><hr><br>
 	Precision: <input type="button" value="-" onclick="decimals(-1)"><input
 			type="button" value="+" onclick="decimals(1)"><br>

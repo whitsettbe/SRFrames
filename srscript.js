@@ -159,7 +159,8 @@ handle refreshing and coordinate swapping from the top-level
 
 var states = [[0, 0, 0], [5, 0, -0.6]];
 var edits = [[0, 0, 0], [5, 0, -0.6]];
-var axes = [true, true];
+var ticks = [true, true];
+var special = [];
 
 //redraw the canvas
 function redraw()
@@ -171,15 +172,25 @@ function redraw()
 	//redraw usual frames
 	for(var i = 0; i < states.length; i ++)
 	{
-		draw(states[i], true, true, true, false, axes[i]);
+		draw(states[i], true, true, true, false, ticks[i]);
 	}
 	drawLight([0, 0, 0]);
 
-	//load special settings, draw highlighted frame, and reset
-	ctx.lineWidth *= 2;
+	//load alternate settings for "special" (multiply-selected) frames
+	ctx.lineWidth = oldLineWidth * 4;
+	ctx.strokeStyle = "#0000FF";
+	for(var i = 0; i < special.length; i++)
+	{
+		draw(states[special[i]], true, true, true, false, ticks[special[i]]);
+	}
+
+	//load alternate settings for highlighted frame
+	ctx.lineWidth = oldLineWidth * 2;
 	ctx.strokeStyle = "#FF0000";
 	draw(states[parseInt(document.getElementById("ref").value) - 1], true, true, true, false,
-			axes[parseInt(document.getElementById("ref").value) - 1]);
+			ticks[parseInt(document.getElementById("ref").value) - 1]);
+
+	//reset draw settings
 	ctx.lineWidth = oldLineWidth;
 	ctx.strokeStyle = oldStrokeStyle;
 }
@@ -204,7 +215,7 @@ function relist()
 	for(var i = 0; i < states.length; i++)
 	{
 		out += (Math.abs(states[i][0]) < TOL && Math.abs(states[i][1]) < TOL &&
-		    	Math.abs(states[i][2]) < TOL ? "> " : "  ") + (i + 1) + "  " + (axes[i] ? "#" : "-") + " " +
+		    	Math.abs(states[i][2]) < TOL ? "> " : "  ") + (i + 1) + "  " + (ticks[i] ? "#" : "-") + " " +
 		    	numForm(states[i][0]) + " " + numForm(states[i][1]) + " " + numForm(states[i][2]) + "<br>";
 	}
 	document.getElementById("states").innerHTML = out + "</pre>";
@@ -271,7 +282,7 @@ function load()
 		document.getElementById("xedit").value = toFloat(states[idx][0]);
 		document.getElementById("tedit").value = toFloat(states[idx][1]);
 		document.getElementById("vedit").value = toFloat(states[idx][2]);
-		document.getElementById("ax").checked = axes[idx];
+		document.getElementById("ax").checked = ticks[idx];
 	}
 	else
 	{
@@ -303,7 +314,7 @@ function save()
 		states[idx][0] = x; edits[idx][0] = x;
 		states[idx][1] = t; edits[idx][1] = t;
 		states[idx][2] = v; edits[idx][2] = v;
-		axes[idx] = document.getElementById("ax").checked;
+		ticks[idx] = document.getElementById("ax").checked;
 		redraw();
 		relist();
 	}
@@ -323,7 +334,7 @@ function saveNew()
 	edits.push([toFloat(document.getElementById("xedit").value),
 			toFloat(document.getElementById("tedit").value),
 			toFloat(document.getElementById("vedit").value)]);
-	axes.push(document.getElementById("ax").checked);
+	ticks.push(document.getElementById("ax").checked);
 	document.getElementById("ref").value = toFloat(states.length);
 	redraw();
 	relist();
@@ -361,7 +372,7 @@ function remove()
 	{
 		states.splice(idx, 1);
 		edits.splice(idx, 1);
-		axes.splice(idx, 1);
+		ticks.splice(idx, 1);
 		redraw();
 		relist();
 	}
@@ -483,12 +494,12 @@ document.getElementById("import").addEventListener('change', function()
 		tMin = toFloat(keys.pop()); tMax = toFloat(keys.pop());
 		xStep = toFloat(keys.pop()); tStep = toFloat(keys.pop());
 		var numFrame = Math.round(toFloat(keys.pop()));
-		states = []; edits = []; axes = [];
+		states = []; edits = []; ticks = [];
 
 		//get reference frame lines
 		for(var i = 0; i < numFrame; i++)
 		{
-			axes.push(Number.parseInt(keys.pop()) == 1);
+			ticks.push(Number.parseInt(keys.pop()) == 1);
 			states.push([]);
 			states[i].push(toFloat(keys.pop()));
 			states[i].push(toFloat(keys.pop()));
@@ -515,7 +526,7 @@ function fileSave()
 	text += xMin + " " + xMax + " " + tMin + " " + tMax + " " + xStep + " " + tStep + "\n";
 	text += states.length + "\n";
 	for(var i = 0; i < states.length; i++)
-		text += (axes[i] ? 1 : 0) + " " + toFloat(states[i][0]) + " " + toFloat(states[i][1]) + " " +
+		text += (ticks[i] ? 1 : 0) + " " + toFloat(states[i][0]) + " " + toFloat(states[i][1]) + " " +
 				toFloat(states[i][2]) + " " + toFloat(edits[i][0]) + " " + toFloat(edits[i][1]) + " " +
 				toFloat(edits[i][2]) + "\n";
 	var data = new Blob([text], {type: 'text/plain'});
@@ -824,6 +835,113 @@ canv.addEventListener("pointerup", function(event)
 	oldMouseX -= canvRect.left;
 	oldMouseY -= canvRect.top;
 }, false);
+
+/*
+new interface mechanics for mouse interaction
+*/
+
+//check the selected frame for special-ness and store if needed
+function checkSpecial()
+{
+	var val = toFloat(document.getElementById("ref").value) - 1;
+	var old = false;
+	for(var i = 0; i < special.length; i++)
+	{
+		if(val == special[i]) old = true;
+	}
+	if(!old)
+	{
+		special.push(val);
+		redraw();
+	}
+}
+
+//function to solve linear equations
+function linSolve(x0, y0, m0, x1, y1, m1)
+{
+	var ma = toFloat(-m0), mb = toFloat(-m1);
+	var a = toFloat(y0 - m0 * x0), b = toFloat(y1 - m1 * x1);
+	return [toFloat((a - b) / (ma - mb)), toFloat((b * ma - a * mb) / (ma - mb))];
+}
+
+//alert(linSolve(5, -5.5, 1/-0.6, 0, 0, 0).join());
+
+//allow selection of new intersect frames
+function intersect()
+{
+	special.push(toFloat(document.getElementById("ref").value) - 1);
+	redraw();
+	interval = setInterval(function()
+	{
+		checkSpecial();
+		if(special.length >= 2)
+		{
+			clearInterval(interval);
+			//continue
+			//...
+
+			oldLen = states.length;
+			//try x-x intersect
+			newLocs = [];
+			if(Math.abs(states[special[0]][2] - states[special[1]][2]) > TOL)
+			{
+				newLocs.push(linSolve(states[special[0]][0], states[special[0]][1], states[special[0]][2],
+						states[special[1]][0], states[special[1]][1], states[special[1]][2]));
+			}
+
+			//try x-t intersect
+			newLocs.push(linSolve(states[special[0]][0], states[special[0]][1], states[special[0]][2],
+					states[special[1]][0], states[special[1]][1],
+					(Math.abs(states[special[1]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[1]][2])));
+
+			//try t-x intersect
+			//alert([states[special[0]][0], states[special[0]][1],
+			//		(states[special[0]][2] < TOL ? 1 / TOL / TOL : 1 / states[special[0]][2]),
+			//		states[special[1]][0], states[special[1]][1], states[special[1]][2]].join('\n'));
+			newLocs.push(linSolve(states[special[0]][0], states[special[0]][1],
+					(Math.abs(states[special[0]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[0]][2]),
+					states[special[1]][0], states[special[1]][1], states[special[1]][2]));
+			//alert(special.join());
+
+			//try t-t intersect
+			if(Math.abs(states[special[0]][2] - states[special[1]][2]) > TOL)
+			{
+				newLocs.push(linSolve(states[special[0]][0], states[special[0]][1],
+						(Math.abs(states[special[0]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[0]][2]),
+						states[special[1]][0], states[special[1]][1],
+						(Math.abs(states[special[1]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[1]][2])));
+			}
+//alert([special, states[0], states[1], newLocs].join('\n'));
+			//add new intersect frames (temporarily)
+			for(var i = 0; i < newLocs.length; i++)
+			{
+				for(var j = 0; j < 2; j++)
+				{
+					//check for newness
+					var old = false;
+					for(var k = 0; k < states.length; k++)
+					{
+						if(Math.abs(states[k][0] - newLocs[i][0]) < TOL &&
+								Math.abs(states[k][1] - newLocs[i][1]) < TOL &&
+								Math.abs(states[k][2] - states[special[j]][2]) < TOL)
+						{
+							old = true;
+						}
+					}
+					if(!old)
+					{
+						states.push(newLocs[i].concat([states[special[j]][2]]));
+						edits.push(newLocs[i].concat([states[special[j]][2]]));
+						ticks.push(false);
+					}
+				}
+			}
+			redraw();
+
+			//@@
+		}
+	}, 250);
+}
 
 /*
 load js elements
