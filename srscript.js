@@ -795,7 +795,7 @@ canv.addEventListener("pointermove", function(event)
 	pan({clientX: ptrX, clientY: ptrY});
 
 	//update highlights and finish saving coordinates
-	showClose({clientX: ptrX, clientY: ptrY});
+	if(pointCache.length == 1) showClose({clientX: ptrX, clientY: ptrY});
 	oldMouseX = ptrX - canvRect.left;
 	oldMouseY = ptrY - canvRect.top;
 
