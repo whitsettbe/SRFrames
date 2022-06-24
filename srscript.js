@@ -626,6 +626,7 @@ function showClose(event)
 	document.getElementById("ref").value = closeLn + 1;
 	load();
 	redraw();
+	relist();
 	return;
 }
 
@@ -968,6 +969,46 @@ function intersect()
 			redraw();
 			relist();
 		})
+	}, 250);
+}
+
+//create new frames as lines drawn between points
+function pointTowards()
+{
+	special.push(toFloat(document.getElementById("ref").value) - 1);
+	redraw();
+	interval = setInterval(function()
+	{
+		checkSpecial();
+		if(special.length < 2) return;
+		clearInterval(interval);
+		//continue
+		//...
+
+		//check frames on light ray
+		var dx = states[special[1]][0] - states[special[0]][0];
+		var dy = states[special[1]][1] - states[special[0]][1];
+		if(Math.abs(Math.abs(dx) - Math.abs(dy)) < TOL)
+		{
+			alert("You can't share time or space at light speed!");
+			special.splice(0);
+			redraw();
+			relist();
+			return;
+		}
+
+		//add frame
+		states.push([states[special[0]][0], states[special[0]][1],
+				(Math.abs(dx) > Math.abs(dy) ? dy / dx : dx / dy)]);
+		edits.push([states[special[0]][0], states[special[0]][1],
+				(Math.abs(dx) > Math.abs(dy) ? dy / dx : dx / dy)]);
+		ticks.push(true);
+
+		//select the new frame
+		document.getElementById("ref").value = states.length;
+		special.splice(0);
+		redraw();
+		relist();
 	}, 250);
 }
 
