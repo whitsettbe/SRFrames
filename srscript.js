@@ -6,7 +6,7 @@ var COORD_RAD = 4;
 var xMin = -10, xMax = 10, tMin = -10, tMax = 10;
 var xStep = 1, tStep = 1;
 var numDec = 4;
-var TOL = .000000000002;//Math.pow(2, -35);
+var TOL = .000000000004;//Math.pow(2, -35);
 var FRAMES = 20;
 var FRAME_GAP = 50;
 
@@ -269,7 +269,7 @@ function updateCoord()
 function decimals(change)
 {
 	numDec += change;
-	numDec = Math.min(Math.max(numDec, 1), 15);
+	numDec = Math.min(Math.max(numDec, 1), 12);
 	update();
 }
 
@@ -466,6 +466,7 @@ var ZOOM_FACTOR = 1.07;
 var oldMouseX = 0, oldMouseY = 0;
 var mouseMode = 0;
 var MOUSE_TIMEOUT = 1000;
+var lockout = false;
 
 //distance from a point (two coords) to a line (two coords per defining point)
 function ptLineDist(x0, y0, x1, y1, x2, y2)
@@ -585,7 +586,7 @@ canv.addEventListener("mousemove", function(event)
 		pan(event);
 
 	//highlights
-	if(event.buttons & LEFT > 0)
+	if(!lockout && event.buttons & LEFT > 0)
 		showClose(event);
 
 	//update most recent location
@@ -603,7 +604,8 @@ canv.addEventListener("mousedown", function(event)
 	var y = event.clientY - canvRect.top;
 
 	//highlights
-	showClose(event);
+	if(!lockout)
+		showClose(event);
 
 	//update most recent location
 	oldMouseX = x;
@@ -621,6 +623,12 @@ canv.addEventListener("wheel", function(event)
 	//don't actually scroll
 	event.preventDefault();
 	return false;
+}, false);
+
+//on mouse up: unlock mouse controls
+canv.addEventListener("mouseup", function(event)
+{
+	lockout = false;
 }, false);
 
 /*
@@ -650,7 +658,8 @@ canv.addEventListener("pointerdown", function(event)
 	oldMouseY /= pointCache.length;
 
 	//update highlights and finish saving coordinates
-	showClose({clientX: oldMouseX, clientY: oldMouseY});
+	if(!lockout)
+		showClose({clientX: oldMouseX, clientY: oldMouseY});
 	oldMouseX -= canvRect.left;
 	oldMouseY -= canvRect.top;
 }, false);
@@ -658,6 +667,8 @@ canv.addEventListener("pointerdown", function(event)
 //update moving pointer
 canv.addEventListener("pointermove", function(event)
 {
+	if(lockout) return;
+
 	//prevent mouse confusion
 	if((new Date()).getTime() - mouseMode < MOUSE_TIMEOUT) return;
 	if(pointCache.length == 0) return;
@@ -698,7 +709,7 @@ canv.addEventListener("pointermove", function(event)
 	pan({clientX: ptrX, clientY: ptrY});
 
 	//update highlights and finish saving coordinates
-	if(pointCache.length == 1) showClose({clientX: ptrX, clientY: ptrY});
+	if(pointCache.length == 1 && !lockout) showClose({clientX: ptrX, clientY: ptrY});
 	oldMouseX = ptrX - canvRect.left;
 	oldMouseY = ptrY - canvRect.top;
 
@@ -707,6 +718,12 @@ canv.addEventListener("pointermove", function(event)
 //unregister removed pointers
 canv.addEventListener("pointerup", function(event)
 {
+	if(lockout)
+	{
+		pointerCache.splice(0);
+	}
+	lockout = false;
+
 	//prevent mouse confusion
 	if((new Date()).getTime() - mouseMode < MOUSE_TIMEOUT) return;
 	event.preventDefault();
@@ -848,6 +865,7 @@ function intersect()
 		}
 //alert([special, states[0], states[1], newLocs].join('\n'));
 		//add new intersect frames (temporarily)
+		lockout = true;
 		for(var i = 0; i < newLocs.length; i++)
 		{
 			for(var j = 0; j < 2; j++)
@@ -928,6 +946,7 @@ function pointTowards()
 		}
 
 		//add frame
+		lockout = true;
 		states.push([states[special[0]][0], states[special[0]][1],
 				(Math.abs(dx) > Math.abs(dy) ? dy / dx : dx / dy)]);
 		edits.push([states[special[0]][0], states[special[0]][1],
