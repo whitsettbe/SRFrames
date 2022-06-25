@@ -742,8 +742,10 @@ canv.addEventListener("pointerup", function(event)
 }, false);
 
 /*
-new interface mechanics for mouse interaction
+new interface mechanics (making use of mouse interaction)
 */
+
+var refUpdate = 0, refUpdateSpecial = 0;
 
 //collect all update functions in a single call
 function update()
@@ -758,19 +760,25 @@ function updateRF(newVal)
 {
 	document.getElementById("ref").value = newVal;
 	update();
+	refUpdate += 1;
 }
 
 //automatically load on user-driven RF# change
 document.getElementById("ref").addEventListener("change", function()
 {
-	if(toFloat(this.value) - states.length > TOL) this.value = states.length;
 	if(this.value.length < 1) this.value = 1;
+	if(this.value.indexOf(".") >= 0) this.value = this.value.split(".")[0];
+	if(toFloat(this.value) - states.length > TOL) this.value = states.length;
+	if(toFloat(this.value) < 1) this.value = 1;
 	update();
+	refUpdate += 1;
 }, false);
 
 //check the selected frame for special-ness and store if needed
 function checkSpecial()
 {
+	if(refUpdate == refUpdateSpecial) return; //don't update until user finishes entering number
+	refUpdateSpecial = refUpdate;
 	var val = toFloat(document.getElementById("ref").value) - 1;
 	var old = false;
 	for(var i = 0; i < special.length; i++)
