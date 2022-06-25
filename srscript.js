@@ -561,14 +561,15 @@ function zoom(event, pwr)
 	var y = tUnscale(event.clientY - canvRect.top);
 
 	//adjust boundaries accordingly
-	document.getElementById("xmin").value = x + Math.pow(ZOOM_FACTOR, pwr) *
-			(toFloat(document.getElementById("xmin").value) - x);
-	document.getElementById("xmax").value = x + Math.pow(ZOOM_FACTOR, pwr) *
-			(toFloat(document.getElementById("xmax").value) - x);
-	document.getElementById("tmin").value = y + Math.pow(ZOOM_FACTOR, pwr) *
-			(toFloat(document.getElementById("tmin").value) - y);
-	document.getElementById("tmax").value = y + Math.pow(ZOOM_FACTOR, pwr) *
-			(toFloat(document.getElementById("tmax").value) - y);
+	document.getElementById("xmin").value = x + Math.pow(ZOOM_FACTOR, pwr) * (xMin - x);
+	document.getElementById("xmax").value = x + Math.pow(ZOOM_FACTOR, pwr) * (xMax - x);
+	document.getElementById("tmin").value = y + Math.pow(ZOOM_FACTOR, pwr) * (tMin - y);
+	document.getElementById("tmax").value = y + Math.pow(ZOOM_FACTOR, pwr) * (tMax - y);
+	updateCoord();
+
+	//tweak tickmark scale
+	document.getElementById("xstep").value = Math.pow(10, Math.round(Math.log((xMax - xMin) / 2) / Math.log(10)) - 1);
+	document.getElementById("tstep").value = toFloat(document.getElementById("xstep").value);
 	updateCoord();
 }
 
