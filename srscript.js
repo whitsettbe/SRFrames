@@ -228,11 +228,11 @@ function animate(oldStates, basis, f)
 	{
 		states[i] = trans(oldStates[i], [basis[0] * f / FRAMES, basis[1] * f / FRAMES, basis[2] * f / FRAMES]);
 	}
-	redraw();
+	update();
 	if(f < FRAMES) setTimeout(function(){animate(oldStates, basis, f + 1);}, FRAME_GAP);
 	else
 	{
-		relist();
+		update();
 		document.getElementById("xedit").value = 0;
 		document.getElementById("tedit").value = 0;
 		document.getElementById("vedit").value = 0;
@@ -257,7 +257,7 @@ function updateCoord()
 		tMax = toFloat(document.getElementById("tmax").value);
 		xStep = toFloat(document.getElementById("xstep").value);
 		tStep = toFloat(document.getElementById("tstep").value);
-		redraw();
+		update();
 	}
 	else
 	{
@@ -270,7 +270,7 @@ function decimals(change)
 {
 	numDec += change;
 	numDec = Math.min(Math.max(numDec, 1), 15);
-	relist();
+	update();
 }
 
 //pull frame info from the form's frame index
@@ -315,8 +315,7 @@ function save()
 		states[idx][1] = t; edits[idx][1] = t;
 		states[idx][2] = v; edits[idx][2] = v;
 		ticks[idx] = document.getElementById("ax").checked;
-		redraw();
-		relist();
+		update();
 	}
 }
 
@@ -335,9 +334,7 @@ function saveNew()
 			toFloat(document.getElementById("tedit").value),
 			toFloat(document.getElementById("vedit").value)]);
 	ticks.push(document.getElementById("ax").checked);
-	document.getElementById("ref").value = toFloat(states.length);
-	redraw();
-	relist();
+	updateRF(toFloat(states.length));
 }
 
 //choose the current editor space as a new reference frame basis and translate everything
@@ -374,9 +371,9 @@ function remove()
 		edits.splice(idx, 1);
 		ticks.splice(idx, 1);
 		if(idx >= states.length)
-			document.getElementById("ref").value = idx - 1;
-		redraw();
-		relist();
+			updateRF(idx - 1);
+		else
+			update();
 	}
 }
 
@@ -423,8 +420,7 @@ document.getElementById("import").addEventListener('change', function()
 
 		//update notes and refresh
 		document.getElementById("notes").value = text.substr(0, text.lastIndexOf('@'));
-		relist();
-		redraw();
+		update();
 	}
 	if(this.files.length > 0) fr.readAsText(this.files[0]);
 
@@ -500,7 +496,7 @@ function showClose(event)
 	//return if no close enough point, else find closest line
 	if(close == -1)
 	{
-		redraw();
+		update();
 		return;
 	}
 	dist = DIM * 2; closeLn = -1;
@@ -532,10 +528,7 @@ function showClose(event)
 	}
 
 	//set dropdown selection and redraw
-	document.getElementById("ref").value = closeLn + 1;
-	load();
-	redraw();
-	relist();
+	updateRF(closeLn + 1);
 	return;
 }
 
@@ -752,6 +745,29 @@ canv.addEventListener("pointerup", function(event)
 new interface mechanics for mouse interaction
 */
 
+//collect all update functions in a single call
+function update()
+{
+	load();
+	redraw();
+	relist();
+}
+
+//handle reference frame switches
+function updateRF(newVal)
+{
+	document.getElementById("ref").value = newVal;
+	update();
+}
+
+//automatically load on user-driven RF# change
+document.getElementById("ref").addEventListener("change", function()
+{
+	if(toFloat(this.value) - states.length > TOL) this.value = states.length;
+	if(this.value.length < 1) this.value = 1;
+	update();
+}, false);
+
 //check the selected frame for special-ness and store if needed
 function checkSpecial()
 {
@@ -764,7 +780,7 @@ function checkSpecial()
 	if(!old)
 	{
 		special.push(val);
-		redraw();
+		update();
 	}
 }
 
@@ -782,7 +798,7 @@ function linSolve(x0, y0, m0, x1, y1, m1)
 function intersect()
 {
 	special.push(toFloat(document.getElementById("ref").value) - 1);
-	redraw();
+	update();
 	interval = setInterval(function()
 	{
 		checkSpecial();
@@ -847,7 +863,7 @@ function intersect()
 				}
 			}
 		}
-		redraw();
+		update();
 
 		//wait for a new frame to be selected (@@only new frames can be selected; there may be none)
 		interval = setInterval(function()
@@ -873,10 +889,8 @@ function intersect()
 			ticks.splice(oldLen + 1);
 
 			//clear special and redraw
-			document.getElementById("ref").value = oldLen + 1;
 			special.splice(0);
-			redraw();
-			relist();
+			updateRF(oldLen + 1);
 		})
 	}, 250);
 }
@@ -885,7 +899,7 @@ function intersect()
 function pointTowards()
 {
 	special.push(toFloat(document.getElementById("ref").value) - 1);
-	redraw();
+	update();
 	interval = setInterval(function()
 	{
 		checkSpecial();
@@ -901,8 +915,7 @@ function pointTowards()
 		{
 			alert("You can't share time or space at light speed!");
 			special.splice(0);
-			redraw();
-			relist();
+			update();
 			return;
 		}
 
@@ -914,10 +927,8 @@ function pointTowards()
 		ticks.push(true);
 
 		//select the new frame
-		document.getElementById("ref").value = states.length;
 		special.splice(0);
-		redraw();
-		relist();
+		updateRF(states.length);
 	}, 250);
 }
 
@@ -925,6 +936,4 @@ function pointTowards()
 load js elements
 */
 
-redraw();
-relist();
-load();
+update();
