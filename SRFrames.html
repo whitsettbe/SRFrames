@@ -19,13 +19,39 @@
 </table>
 <div id="temp" style="display: none;">
 <form>
+	<input type="button" value="Import from file" id="btnImport">
+	<input type="file" id="import" value="" style="display: none;">
+	<input type="button" value="Export to file" onclick="fileSave()">
+	<a download="refframe.txt.rf" id="exportLink" style="display: none"></a><br>
+	<hr>
+	RF#: <input type="number" id="ref" value="1"> <input
+			type="button" value="Pick Frame" onclick="transform()"> <input
+			type="button" value="Remove" onclick="remove()"><br>
+	<hr>
 	<input type="button" id="btnIntersect" value="Intersect" onclick="intersect()">
-	<input type="button" id="btnPointTo" value="Point towards" onclick="pointTowards()">
-	<br>
-	<br>
-	Import from file: <input type="file" id="import" value="" onclick="import()"><br>
-	Export to file: <input type="button" value="Download" onclick="fileSave()"><a download="refframe.txt.rf" id="exportLink" style="display: none"></a><br>
-	<br><hr>
+	<input type="button" id="btnPointTo" value="Point towards" onclick="pointTowards()"><br>
+	<hr>
+	<input type="button" id="btnSave" value="Save" onclick="save()"> <input
+			type="button" id="btnSaveNew" value="Save New" onclick="saveNew()"><br>
+	<hr>
+	<div id="edits" style="display: none;">
+		X: <input type="text" id="xedit" value="0" pattern="-?[0-9]+(\.[0-9]*)?" required><br>T: <input
+				type="text" id="tedit" value="0" pattern="-?[0-9]+(\.[0-9]*)?" required><br>V: <input
+				type="text" id="vedit" value="0" pattern="-?0\.?[0-9]*" required><br>
+		Show ticks? <input type="checkbox" id="ax" checked="true"><br>
+	</div>
+	<hr>
+	Calculate velocity between two measurements:<br>
+	D1: <input type="text" id="d1" value="0" pattern="[.0-9]*"> D2: <input
+			type="text" id="d2" value="0" pattern="[.0-9]*"> <input
+			type="button" value="Calculate" onclick="calcV()"> V: <input
+			type="text" id="vcalc" value="0" pattern="[.0-9]*" readonly><br>
+	<hr>
+	Tick scale: <input type="text" id="xstep" value="1" pattern="[.0-9e]+" readonly><br>
+	<hr>
+	Precision: <input type="button" value="-" onclick="decimals(-1)"><input
+			type="button" value="+" onclick="decimals(1)"><br>
+
 	<div style="display: none;"><!--leftover input elements still used by the JS-->
 		<br>
 		X=displacement, T=time, V=velocity (with respect to c), Lt=light<br>
@@ -38,34 +64,11 @@
 				<input type="text" id="tstep" value="1" pattern="[.0-9]+" required><br>
 		<input type="button" value="Update coordinates" onclick="updateCoord()"><br>
 	</div>
-	Tick scale: <input type="text" id="xstep" value="1" pattern="[.0-9e]+" readonly>
-	<br><hr><br>
-	RF#: <input type="number" id="ref" value="1"> <input
-			type="button" id="btnSave" value="Save" onclick="save()"> <input
-			type="button" id="btnSaveNew" value="Save New" onclick="saveNew()"> <input
-			type="button" value="Pick Frame" onclick="transform()"> <input
-			type="button" value="Remove" onclick="remove()"><br>
-	<hr>
-	<div id="edits" style="display: none;">
-		X: <input type="text" id="xedit" value="0" pattern="-?0\.?[0-9]*" required> T: <input
-				type="text" id="tedit" value="0" pattern="-?0\.?[0-9]*" required> V: <input
-				type="text" id="vedit" value="0" pattern="-?0\.?[0-9]*" required><br>
-		Show tick marks? <input type="checkbox" id="ax" value="Show axes?" checked="true"><br>
-	</div>
-	<hr><br>
-	Calculate velocity between two measurements:<br>
-	D1: <input type="text" id="d1" value="0" pattern="[.0-9]*"> D2: <input
-			type="text" id="d2" value="0" pattern="[.0-9]*"> <input
-			type="button" value="Calculate" onclick="calcV()"> V: <input
-			type="text" id="vcalc" value="0" pattern="[.0-9]*" readonly><br>
-	<br><hr><br>
-	Precision: <input type="button" value="-" onclick="decimals(-1)"><input
-			type="button" value="+" onclick="decimals(1)"><br>
 </form>
 <p id="states"></p>
 </div>
 <hr>
-<textarea id="notes">Notes...8:08am</textarea>
+<textarea id="notes">Notes...9:22am</textarea>
 <script src="srscript.js"></script>
 </body>
 </html>

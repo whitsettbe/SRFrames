@@ -405,6 +405,12 @@ function remove()
 handle exports/imports
 */
 
+//face for file opener
+document.getElementById("btnImport").addEventListener("click", function()
+{
+	document.getElementById("import").click();
+}, false);
+
 //file opener
 document.getElementById("import").addEventListener('change', function()
 {
@@ -444,9 +450,13 @@ document.getElementById("import").addEventListener('change', function()
 
 		//update notes and refresh
 		document.getElementById("notes").value = text.substr(0, text.lastIndexOf('@'));
-		update();
+		document.getElementById("import").value = "";
+		updateRF(1);
 	}
-	if(this.files.length > 0) fr.readAsText(this.files[0]);
+	if(this.files.length > 0)
+	{
+		fr.readAsText(this.files[0]);
+	}
 
 });
 
