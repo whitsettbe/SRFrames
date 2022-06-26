@@ -721,7 +721,7 @@ canv.addEventListener("pointerup", function(event)
 {
 	if(lockout)
 	{
-		pointerCache.splice(0);
+		pointCache.splice(0);
 	}
 	lockout = false;
 
