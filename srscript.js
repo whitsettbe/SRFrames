@@ -315,7 +315,8 @@ function save()
 			alert("Superluminal speeds not allowed");
 			return;
 		}
-		else if((Math.abs(states[idx][0] - edits[idx][0]) < TOL && Math.abs(states[idx][1] - edits[idx][1]) < TOL &&
+		else if((Math.abs(states[idx][0] - edits[idx][0]) < TOL &&
+				Math.abs(states[idx][1] - edits[idx][1]) < TOL &&
 				Math.abs(states[idx][2] - edits[idx][2]) < TOL) || confirm(
 				"This will permanently overwrite data you wrote in another reference frame."))
 		{
@@ -423,7 +424,8 @@ document.getElementById("import").addEventListener('change', function()
 		var load = document.getElementById("import");
 		var ext = load.value.substring(load.value.lastIndexOf('.') + 1);
 		if(!(ext.startsWith("rf") && ext.length == 2) &&
-				!confirm("This file is not a recognized \"rf\" file type.\nAre you still sure to continue?")) return;
+				!confirm("This file is not a recognized \"rf\" file type.\nAre you still sure to continue?"))
+			return;
 
 		//start loading
 		var text = fr.result;
@@ -505,7 +507,8 @@ var lockout = false;
 //distance from a point (two coords) to a line (two coords per defining point)
 function ptLineDist(x0, y0, x1, y1, x2, y2)
 {
-	return Math.abs((x2 - x1) * (y1 - y0) - (x1 - x0) * (y2 - y1)) / Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
+	return Math.abs((x2 - x1) * (y1 - y0) - (x1 - x0) * (y2 - y1)) /
+			Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
 }
 
 //highlight closest frame
@@ -544,8 +547,8 @@ function showClose(event)
 		}
 
 		//try closest x axis
-		r = ptLineDist(x, y, xScale(xMin), tScale(states[i][1] + states[i][2] * (xMin - states[i][0])), xScale(xMax),
-				tScale(states[i][1] + states[i][2] * (xMax - states[i][0])));
+		r = ptLineDist(x, y, xScale(xMin), tScale(states[i][1] + states[i][2] * (xMin - states[i][0])),
+				xScale(xMax), tScale(states[i][1] + states[i][2] * (xMax - states[i][0])));
 		if(r < dist)
 		{
 			dist = r;
@@ -603,7 +606,8 @@ function zoom(event, pwr)
 	canv.style.cursor = (pwr > 0 ? "zoom-out" : "zoom-in");
 
 	//tweak tickmark scale
-	document.getElementById("xstep").value = Math.pow(10, Math.round(Math.log((xMax - xMin) / 2) / Math.log(10)) - 1);
+	document.getElementById("xstep").value = Math.pow(10, Math.round(Math.log((xMax - xMin) / 2)
+			/ Math.log(10)) - 1);
 	document.getElementById("tstep").value = toFloat(document.getElementById("xstep").value);
 	updateCoord();
 }
