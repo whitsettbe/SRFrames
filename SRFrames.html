@@ -19,8 +19,8 @@
 </table>
 <div id="temp" style="display: none;">
 <form>
-	<input type="button" value="Intersect" onclick="intersect()">
-	<input type="button" value="Point towards" onclick="pointTowards()">
+	<input type="button" id="btnIntersect" value="Intersect" onclick="intersect()">
+	<input type="button" id="btnPointTo" value="Point towards" onclick="pointTowards()">
 	<br>
 	<br>
 	Import from file: <input type="file" id="import" value="" onclick="import()"><br>
@@ -38,24 +38,26 @@
 				<input type="text" id="tstep" value="1" pattern="[.0-9]+" required><br>
 		<input type="button" value="Update coordinates" onclick="updateCoord()"><br>
 	</div>
-	Tick scale: <input type="text" id="xstep" value="1" pattern="[.0-9e]+" disabled>
+	Tick scale: <input type="text" id="xstep" value="1" pattern="[.0-9e]+" readonly>
 	<br><hr><br>
-	RF#: <input type="number" id="ref" value="1"><input
-			type="button" value="Save" onclick="save()"> <input
-			type="button" value="Save New" onclick="saveNew()"> <input
+	RF#: <input type="number" id="ref" value="1"> <input
+			type="button" id="btnSave" value="Save" onclick="save()"> <input
+			type="button" id="btnSaveNew" value="Save New" onclick="saveNew()"> <input
 			type="button" value="Pick Frame" onclick="transform()"> <input
 			type="button" value="Remove" onclick="remove()"><br>
-	<br>
-	X: <input type="text" id="xedit" value="0" pattern="[-.0-9e]+" required> T: <input
-			type="text" id="tedit" value="0" pattern="[-.0-9e]+" required> V: <input
-			type="text" id="vedit" value="0" pattern="[-.0-9e]+" required><br>
-	Show tick marks? <input type="checkbox" id="ax" value="Show axes?" checked="true"><br>
-	<br><hr><br>
+	<hr>
+	<div id="edits" style="display: none;">
+		X: <input type="text" id="xedit" value="0" pattern="-?0\.?[0-9]*" required> T: <input
+				type="text" id="tedit" value="0" pattern="-?0\.?[0-9]*" required> V: <input
+				type="text" id="vedit" value="0" pattern="-?0\.?[0-9]*" required><br>
+		Show tick marks? <input type="checkbox" id="ax" value="Show axes?" checked="true"><br>
+	</div>
+	<hr><br>
 	Calculate velocity between two measurements:<br>
-	D1: <input type="text" id="d1" value="0" pattern="[.0-9e]*"> D2: <input
-			type="text" id="d2" value="0" pattern="[.0-9e]*"> <input
+	D1: <input type="text" id="d1" value="0" pattern="[.0-9]*"> D2: <input
+			type="text" id="d2" value="0" pattern="[.0-9]*"> <input
 			type="button" value="Calculate" onclick="calcV()"> V: <input
-			type="text" id="vcalc" value="0" pattern="[.0-9e]*" disabled><br>
+			type="text" id="vcalc" value="0" pattern="[.0-9]*" readonly><br>
 	<br><hr><br>
 	Precision: <input type="button" value="-" onclick="decimals(-1)"><input
 			type="button" value="+" onclick="decimals(1)"><br>
@@ -63,7 +65,7 @@
 <p id="states"></p>
 </div>
 <hr>
-<textarea id="notes">Notes...6:43am</textarea>
+<textarea id="notes">Notes...8:08am</textarea>
 <script src="srscript.js"></script>
 </body>
 </html>

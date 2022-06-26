@@ -3,6 +3,12 @@ input[type='text'], input[type='number']
 	width: 80px;
 }
 
+input[type='button'], input[type='file']
+{
+	border-color: #aaaaaa;
+	border-style: outset;
+}
+
 input:invalid
 {
 	background-color: pink;

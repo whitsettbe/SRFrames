@@ -293,48 +293,72 @@ function load()
 //update frame info at the form's frame index
 function save()
 {
-	var idx = toFloat(document.getElementById("ref").value) - 1;
-	var x = toFloat(document.getElementById("xedit").value);
-	var t = toFloat(document.getElementById("tedit").value);
-	var v = toFloat(document.getElementById("vedit").value);
-	if(idx < 0 || states.length <= idx || Math.abs(idx - Math.round(idx)) > TOL)
+	btnSave = document.getElementById("btnSave");
+	if(getComputedStyle(btnSave).borderStyle === "outset")
 	{
-		alert("Invalid reference frame index.");
-		return;
+		document.getElementById("edits").style.display = "inline";
+		btnSave.style.borderStyle = "inset";
 	}
-	else if(Math.abs(v) >= 1)
+	else
 	{
-		alert("Superluminal speeds not allowed");
-		return;
-	}
-	else if((Math.abs(states[idx][0] - edits[idx][0]) < TOL && Math.abs(states[idx][1] - edits[idx][1]) < TOL &&
-			Math.abs(states[idx][2] - edits[idx][2]) < TOL) || confirm(
-			"This will permanently overwrite data you wrote in another reference frame."))
-	{
-		states[idx][0] = x; edits[idx][0] = x;
-		states[idx][1] = t; edits[idx][1] = t;
-		states[idx][2] = v; edits[idx][2] = v;
-		ticks[idx] = document.getElementById("ax").checked;
-		update();
+		var idx = toFloat(document.getElementById("ref").value) - 1;
+		var x = toFloat(document.getElementById("xedit").value);
+		var t = toFloat(document.getElementById("tedit").value);
+		var v = toFloat(document.getElementById("vedit").value);
+		if(idx < 0 || states.length <= idx || Math.abs(idx - Math.round(idx)) > TOL)
+		{
+			alert("Invalid reference frame index.");
+			return;
+		}
+		else if(Math.abs(v) >= 1)
+		{
+			alert("Superluminal speeds not allowed");
+			return;
+		}
+		else if((Math.abs(states[idx][0] - edits[idx][0]) < TOL && Math.abs(states[idx][1] - edits[idx][1]) < TOL &&
+				Math.abs(states[idx][2] - edits[idx][2]) < TOL) || confirm(
+				"This will permanently overwrite data you wrote in another reference frame."))
+		{
+			states[idx][0] = x; edits[idx][0] = x;
+			states[idx][1] = t; edits[idx][1] = t;
+			states[idx][2] = v; edits[idx][2] = v;
+			ticks[idx] = document.getElementById("ax").checked;
+			update();
+		}
+
+		document.getElementById("edits").style.display = "none";
+		btnSave.style.borderStyle = "outset";
 	}
 }
 
 //create new reference frame and change the selected index
 function saveNew()
 {
-	if(Math.abs(toFloat(document.getElementById("vedit").value)) >= 1)
+	btnSaveNew = document.getElementById("btnSaveNew");
+	if(getComputedStyle(btnSaveNew).borderStyle === "outset")
 	{
-		alert("Superluminal speeds not allowed");
-		return;
+		document.getElementById("edits").style.display = "inline";
+		btnSaveNew.style.borderStyle = "inset";
 	}
-	states.push([toFloat(document.getElementById("xedit").value),
-			toFloat(document.getElementById("tedit").value),
-			toFloat(document.getElementById("vedit").value)]);
-	edits.push([toFloat(document.getElementById("xedit").value),
-			toFloat(document.getElementById("tedit").value),
-			toFloat(document.getElementById("vedit").value)]);
-	ticks.push(document.getElementById("ax").checked);
-	updateRF(toFloat(states.length));
+	else
+	{
+		if(Math.abs(toFloat(document.getElementById("vedit").value)) >= 1)
+		{
+			alert("Superluminal speeds not allowed");
+			return;
+		}
+		states.push([toFloat(document.getElementById("xedit").value),
+				toFloat(document.getElementById("tedit").value),
+				toFloat(document.getElementById("vedit").value)]);
+		edits.push([toFloat(document.getElementById("xedit").value),
+				toFloat(document.getElementById("tedit").value),
+				toFloat(document.getElementById("vedit").value)]);
+		ticks.push(document.getElementById("ax").checked);
+		updateRF(toFloat(states.length));
+
+		document.getElementById("edits").style.display = "none";
+		btnSaveNew.style.borderStyle = "outset";
+	}
 }
 
 //choose the current editor space as a new reference frame basis and translate everything
@@ -550,7 +574,7 @@ function pan(event)
 	document.getElementById("tmin").value = -dy + toFloat(document.getElementById("tmin").value);
 	document.getElementById("tmax").value = -dy + toFloat(document.getElementById("tmax").value);
 	updateCoord();
-
+	canv.style.cursor = "move";
 }
 
 //zoom with given power
@@ -566,6 +590,7 @@ function zoom(event, pwr)
 	document.getElementById("tmin").value = y + Math.pow(ZOOM_FACTOR, pwr) * (tMin - y);
 	document.getElementById("tmax").value = y + Math.pow(ZOOM_FACTOR, pwr) * (tMax - y);
 	updateCoord();
+	canv.style.cursor = (pwr > 0 ? "zoom-out" : "zoom-in");
 
 	//tweak tickmark scale
 	document.getElementById("xstep").value = Math.pow(10, Math.round(Math.log((xMax - xMin) / 2) / Math.log(10)) - 1);
@@ -581,14 +606,15 @@ canv.addEventListener("mousemove", function(event)
 	//get mouse location
 	var x = event.pageX - canvRect.left;
 	var y = event.pageY - canvRect.top;
-
-	//drag panning
-	if(event.buttons & LEFT > 0)
-		pan(event);
+	canv.style.cursor = "default";
 
 	//highlights
 	if(!lockout && event.buttons & LEFT > 0)
 		showClose(event);
+
+	//drag panning
+	if(event.buttons & LEFT > 0)
+		pan(event);
 
 	//update most recent location
 	oldMouseX = x;
@@ -630,6 +656,7 @@ canv.addEventListener("wheel", function(event)
 canv.addEventListener("mouseup", function(event)
 {
 	lockout = false;
+	canv.style.cursor = "default";
 }, false);
 
 /*
