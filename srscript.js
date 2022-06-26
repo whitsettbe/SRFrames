@@ -478,8 +478,8 @@ function ptLineDist(x0, y0, x1, y1, x2, y2)
 function showClose(event)
 {
 	//get closest point
-	var x = event.clientX - canvRect.left;
-	var y = event.clientY - canvRect.top;
+	var x = event.pageX - canvRect.left;
+	var y = event.pageY - canvRect.top;
 	var dist = DIM * 2, close = -1;
 	var r = 0;
 	for(var i = 0; i < states.length; i++)
@@ -537,8 +537,8 @@ function showClose(event)
 function pan(event)
 {
 	//get mouse location
-	var x = event.clientX - canvRect.left;
-	var y = event.clientY - canvRect.top;
+	var x = event.pageX - canvRect.left;
+	var y = event.pageY - canvRect.top;
 	
 	//determine coordinate shift
 	var dx = xUnscale(x) - xUnscale(oldMouseX);
@@ -557,8 +557,8 @@ function pan(event)
 function zoom(event, pwr)
 {
 	//get mouse coordinates ON GRID
-	var x = xUnscale(event.clientX - canvRect.left);
-	var y = tUnscale(event.clientY - canvRect.top);
+	var x = xUnscale(event.pageX - canvRect.left);
+	var y = tUnscale(event.pageY - canvRect.top);
 
 	//adjust boundaries accordingly
 	document.getElementById("xmin").value = x + Math.pow(ZOOM_FACTOR, pwr) * (xMin - x);
@@ -579,8 +579,8 @@ canv.addEventListener("mousemove", function(event)
 	mouseMode = (new Date()).getTime();
 
 	//get mouse location
-	var x = event.clientX - canvRect.left;
-	var y = event.clientY - canvRect.top;
+	var x = event.pageX - canvRect.left;
+	var y = event.pageY - canvRect.top;
 
 	//drag panning
 	if(event.buttons & LEFT > 0)
@@ -601,8 +601,8 @@ canv.addEventListener("mousedown", function(event)
 	mouseMode = (new Date()).getTime();
 
 	//get mouse location
-	var x = event.clientX - canvRect.left;
-	var y = event.clientY - canvRect.top;
+	var x = event.pageX - canvRect.left;
+	var y = event.pageY - canvRect.top;
 
 	//highlights
 	if(!lockout)
@@ -652,15 +652,15 @@ canv.addEventListener("pointerdown", function(event)
 	oldMouseY = 0;
 	for(var i = 0; i < pointCache.length; i++)
 	{
-		oldMouseX += pointCache[i].clientX;
-		oldMouseY += pointCache[i].clientY;
+		oldMouseX += pointCache[i].pageX;
+		oldMouseY += pointCache[i].pageY;
 	}
 	oldMouseX /= pointCache.length;
 	oldMouseY /= pointCache.length;
 
 	//update highlights and finish saving coordinates
 	if(!lockout)
-		showClose({clientX: oldMouseX, clientY: oldMouseY});
+		showClose({pageX: oldMouseX, pageY: oldMouseY});
 	oldMouseX -= canvRect.left;
 	oldMouseY -= canvRect.top;
 }, false);
@@ -688,12 +688,12 @@ canv.addEventListener("pointermove", function(event)
 	//given two pointers, create zoomable wheel event
 	if(pointCache.length == 2)
 	{
-		var ptrGap = Math.sqrt(Math.pow(pointCache[0].clientX - pointCache[1].clientX, 2) +
-				Math.pow(pointCache[0].clientY - pointCache[1].clientY, 2));
+		var ptrGap = Math.sqrt(Math.pow(pointCache[0].pageX - pointCache[1].pageX, 2) +
+				Math.pow(pointCache[0].pageY - pointCache[1].pageY, 2));
 		if(prevPtrGap == 0) prevPtrGap = ptrGap;
 		//alert([prevPtrGap, ptrGap, Math.log(prevPtrGap / ptrGap), Math.log(prevPtrGap / ptrGap) / Math.log(ZOOM_FACTOR)]);
-		zoom({clientX: (pointCache[0].clientX + pointCache[1].clientX) / 2,
-				clientY: (pointCache[0].clientY + pointCache[1].clientY) / 2},
+		zoom({pageX: (pointCache[0].pageX + pointCache[1].pageX) / 2,
+				pageY: (pointCache[0].pageY + pointCache[1].pageY) / 2},
 				Math.log(prevPtrGap / ptrGap) / Math.log(ZOOM_FACTOR));
 		prevPtrGap = ptrGap;
 	}
@@ -702,15 +702,15 @@ canv.addEventListener("pointermove", function(event)
 	var ptrX = 0, ptrY = 0;
 	for(var i = 0; i < pointCache.length; i++)
 	{
-		ptrX += pointCache[i].clientX;
-		ptrY += pointCache[i].clientY;
+		ptrX += pointCache[i].pageX;
+		ptrY += pointCache[i].pageY;
 	}
 	ptrX /= pointCache.length;
 	ptrY /= pointCache.length;
-	pan({clientX: ptrX, clientY: ptrY});
+	pan({pageX: ptrX, pageY: ptrY});
 
 	//update highlights and finish saving coordinates
-	if(pointCache.length == 1 && !lockout) showClose({clientX: ptrX, clientY: ptrY});
+	if(pointCache.length == 1 && !lockout) showClose({pageX: ptrX, pageY: ptrY});
 	oldMouseX = ptrX - canvRect.left;
 	oldMouseY = ptrY - canvRect.top;
 
@@ -747,14 +747,14 @@ canv.addEventListener("pointerup", function(event)
 	oldMouseY = 0;
 	for(var i = 0; i < pointCache.length; i++)
 	{
-		oldMouseX += pointCache[i].clientX;
-		oldMouseY += pointCache[i].clientY;
+		oldMouseX += pointCache[i].pageX;
+		oldMouseY += pointCache[i].pageY;
 	}
 	oldMouseX /= pointCache.length;
 	oldMouseY /= pointCache.length;
 
 	//update highlights and finish saving coordinates
-	if(pointCache.length > 0) showClose({clientX: oldMouseX, clientY: oldMouseY});
+	if(pointCache.length > 0) showClose({pageX: oldMouseX, pageY: oldMouseY});
 	oldMouseX -= canvRect.left;
 	oldMouseY -= canvRect.top;
 }, false);

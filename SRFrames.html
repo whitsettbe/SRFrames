@@ -7,7 +7,7 @@
 <body style="font-family: monospace;">
 <table>
 	<tr>
-		<td style=" vertical-align:top;">
+		<td style="vertical-align:top;">
 			<canvas id="myCanvas" width="100" height="100" style="border:1px solid #d3d3d3; touch-action:none"></canvas>
 		</td>
 		<td id="wide" valign="top"></td>
@@ -25,16 +25,20 @@
 	<br>
 	Import from file: <input type="file" id="import" value="" onclick="import()"><br>
 	Export to file: <input type="button" value="Download" onclick="fileSave()"><a download="refframe.txt.rf" id="exportLink" style="display: none"></a><br>
-	<br><hr><br>
-	X=displacement, T=time, V=velocity (with respect to c), Lt=light<br>
-	<br>
-	X min: <input type="text" id="xmin" value="-10" pattern="[-.0-9e]+" required> X max:
-			<input type="text" id="xmax" value="10" pattern="[-.0-9e]+" required><br>
-	T min: <input type="text" id="tmin" value="-10" pattern="[-.0-9e]+" required> T max:
-			<input type="text" id="tmax" value="10" pattern="[-.0-9e]+" required><br>
-	&#160&#160&#160ΔX: <input type="text" id="xstep" value="1" pattern="[.0-9e]+" required> &#160&#160&#160ΔT:
-			<input type="text" id="tstep" value="1" pattern="[.0-9]+" required><br>
-	<input type="button" value="Update coordinates" onclick="updateCoord()"><br>
+	<br><hr>
+	<div style="display: none;"><!--leftover input elements still used by the JS-->
+		<br>
+		X=displacement, T=time, V=velocity (with respect to c), Lt=light<br>
+		<br>
+		X min: <input type="text" id="xmin" value="-10" pattern="[-.0-9e]+" required> X max:
+				<input type="text" id="xmax" value="10" pattern="[-.0-9e]+" required><br>
+		T min: <input type="text" id="tmin" value="-10" pattern="[-.0-9e]+" required> T max:
+				<input type="text" id="tmax" value="10" pattern="[-.0-9e]+" required><br>
+		&#160&#160&#160ΔX:  &#160&#160&#160ΔT:
+				<input type="text" id="tstep" value="1" pattern="[.0-9]+" required><br>
+		<input type="button" value="Update coordinates" onclick="updateCoord()"><br>
+	</div>
+	Tick scale: <input type="text" id="xstep" value="1" pattern="[.0-9e]+" disabled>
 	<br><hr><br>
 	RF#: <input type="number" id="ref" value="1"><input
 			type="button" value="Save" onclick="save()"> <input
@@ -59,7 +63,7 @@
 <p id="states"></p>
 </div>
 <hr>
-<textarea id="notes">Notes...6:12am</textarea>
+<textarea id="notes">Notes...6:43am</textarea>
 <script src="srscript.js"></script>
 </body>
 </html>
