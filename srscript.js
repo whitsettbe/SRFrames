@@ -161,6 +161,7 @@ var states = [[0, 0, 0], [5, 0, -0.6]];
 var edits = [[0, 0, 0], [5, 0, -0.6]];
 var ticks = [true, true];
 var special = [];
+var specialCap = 0;
 
 //redraw the canvas
 function redraw()
@@ -502,7 +503,7 @@ var ZOOM_FACTOR = 1.07;
 var oldMouseX = 0, oldMouseY = 0;
 var mouseMode = 0;
 var MOUSE_TIMEOUT = 1000;
-var lockout = false;
+//var lockout = false;
 
 //distance from a point (two coords) to a line (two coords per defining point)
 function ptLineDist(x0, y0, x1, y1, x2, y2)
@@ -531,12 +532,13 @@ function showClose(event)
 		}
 	}
 
-	//return if no close enough point, else find closest line
+	//return if no close enough point, else find closest line defined on that point
 	if(close == -1)
 	{
 		update();
 		return;
 	}
+
 	dist = DIM * 2; closeLn = -1;
 	for(var i = 0; i < states.length; i++)
 	{
@@ -565,8 +567,9 @@ function showClose(event)
 		}
 	}
 
-	//set dropdown selection and redraw
+	//set dropdown selection, update "special" frame indices, and redraw
 	updateRF(closeLn + 1);
+	if(special.length < specialCap) checkSpecial();
 	return;
 }
 
@@ -623,7 +626,7 @@ canv.addEventListener("mousemove", function(event)
 	canv.style.cursor = "default";
 
 	//highlights
-	if(!lockout && event.buttons & LEFT > 0)
+	if(/*!lockout && */event.buttons & LEFT > 0)
 		showClose(event);
 
 	//drag panning
@@ -645,7 +648,7 @@ canv.addEventListener("mousedown", function(event)
 	var y = event.pageY - canvRect.top;
 
 	//highlights
-	if(!lockout)
+	//if(!lockout)
 		showClose(event);
 
 	//update most recent location
@@ -669,7 +672,7 @@ canv.addEventListener("wheel", function(event)
 //on mouse up: unlock mouse controls
 canv.addEventListener("mouseup", function(event)
 {
-	lockout = false;
+	//lockout = false;
 	canv.style.cursor = "default";
 }, false);
 
@@ -700,7 +703,7 @@ canv.addEventListener("pointerdown", function(event)
 	oldMouseY /= pointCache.length;
 
 	//update highlights and finish saving coordinates
-	if(!lockout)
+	//if(!lockout)
 		showClose({pageX: oldMouseX, pageY: oldMouseY});
 	oldMouseX -= canvRect.left;
 	oldMouseY -= canvRect.top;
@@ -709,7 +712,7 @@ canv.addEventListener("pointerdown", function(event)
 //update moving pointer
 canv.addEventListener("pointermove", function(event)
 {
-	if(lockout) return;
+	//if(lockout) return;
 
 	//prevent mouse confusion
 	if((new Date()).getTime() - mouseMode < MOUSE_TIMEOUT) return;
@@ -751,7 +754,7 @@ canv.addEventListener("pointermove", function(event)
 	pan({pageX: ptrX, pageY: ptrY});
 
 	//update highlights and finish saving coordinates
-	if(pointCache.length == 1 && !lockout) showClose({pageX: ptrX, pageY: ptrY});
+	if(pointCache.length == 1/* && !lockout*/) showClose({pageX: ptrX, pageY: ptrY});
 	oldMouseX = ptrX - canvRect.left;
 	oldMouseY = ptrY - canvRect.top;
 
@@ -760,11 +763,11 @@ canv.addEventListener("pointermove", function(event)
 //unregister removed pointers
 canv.addEventListener("pointerup", function(event)
 {
-	if(lockout)
-	{
-		pointCache.splice(0);
-	}
-	lockout = false;
+	//if(lockout)
+	//{
+	//	pointCache.splice(0);
+	//}
+	//lockout = false;
 
 	//prevent mouse confusion
 	if((new Date()).getTime() - mouseMode < MOUSE_TIMEOUT) return;
@@ -831,12 +834,14 @@ document.getElementById("ref").addEventListener("change", function()
 	if(toFloat(this.value) < 1) this.value = 1;
 	update();
 	refUpdate += 1;
+	checkSpecial();
 }, false);
 
 //check the selected frame for special-ness and store if needed
 function checkSpecial()
 {
 	if(refUpdate == refUpdateSpecial) return; //don't update until user finishes entering number
+	//(@@ could cause lockout sometimes...)
 	refUpdateSpecial = refUpdate;
 	var val = toFloat(document.getElementById("ref").value) - 1;
 	var old = false;
@@ -864,16 +869,14 @@ function linSolve(x0, y0, m0, x1, y1, m1)
 //allow selection of new intersect frames
 function intersect()
 {
-	special.push(toFloat(document.getElementById("ref").value) - 1);
-	update();
-	interval = setInterval(function()
+	btnIntersect = document.getElementById("btnIntersect");
+	if(getComputedStyle(btnIntersect).borderStyle === "outset")
 	{
-		checkSpecial();
-		if(special.length < 2) return;
-		clearInterval(interval);
-		//continue
-		//...
-
+		specialCap = 2;
+		btnIntersect.style.borderStyle = "inset";
+	}
+	else if(special.length == specialCap && specialCap == 2)
+	{
 		oldLen = states.length;
 		//try x-x intersect
 		newLocs = [];
@@ -907,7 +910,7 @@ function intersect()
 		}
 //alert([special, states[0], states[1], newLocs].join('\n'));
 		//add new intersect frames (temporarily)
-		lockout = true;
+		//lockout = true;
 		for(var i = 0; i < newLocs.length; i++)
 		{
 			for(var j = 0; j < 2; j++)
@@ -933,49 +936,45 @@ function intersect()
 		}
 		update();
 
-		//wait for a new frame to be selected (@@only new frames can be selected; there may be none)
-		interval = setInterval(function()
+		specialCap = 3;
+	}
+	else if(special.length == specialCap && specialCap == 3)
+	{
+		/*if(special[2] < oldLen)
 		{
-			checkSpecial();
-			if(special.length < 3) return;
-			if(special[2] < oldLen)
-			{
-				special.splice(2);
-				return;
-			}
-			//@@confirmation button?
-			clearInterval(interval);
-			//continue
-			//...
+			special.splice(2);
+			update();
+			return;
+		}*/
 
-			//save the selected frame and delete others
-			[states[oldLen], states[special[2]]] = [states[special[2]], states[oldLen]];
-			[edits[oldLen], edits[special[2]]] = [edits[special[2]], edits[oldLen]];
-			[ticks[oldLen], ticks[special[2]]] = [ticks[special[2]], ticks[oldLen]];
-			states.splice(oldLen + 1);
-			edits.splice(oldLen + 1);
-			ticks.splice(oldLen + 1);
+		//save the selected frame and delete others
+		[states[oldLen], states[special[2]]] = [states[special[2]], states[oldLen]];
+		[edits[oldLen], edits[special[2]]] = [edits[special[2]], edits[oldLen]];
+		[ticks[oldLen], ticks[special[2]]] = [ticks[special[2]], ticks[oldLen]];
+		states.splice(oldLen + 1);
+		edits.splice(oldLen + 1);
+		ticks.splice(oldLen + 1);
 
-			//clear special and redraw
-			special.splice(0);
-			updateRF(oldLen + 1);
-		})
-	}, 250);
+		//clear special and redraw
+		special.splice(0);
+		updateRF(oldLen + 1);
+
+		specialCap = 0;
+		btnIntersect.style.borderStyle = "outset";
+	}
 }
 
 //create new frames as lines drawn between points
 function pointTowards()
 {
-	special.push(toFloat(document.getElementById("ref").value) - 1);
-	update();
-	interval = setInterval(function()
+	btnPointTo = document.getElementById("btnPointTo");
+	if(getComputedStyle(btnPointTo).borderStyle === "outset")
 	{
-		checkSpecial();
-		if(special.length < 2) return;
-		clearInterval(interval);
-		//continue
-		//...
-
+		specialCap = 2;
+		btnPointTo.style.borderStyle = "inset";
+	}
+	else if(special.length == specialCap && specialCap == 2)
+	{
 		//check frames on light ray
 		var dx = states[special[1]][0] - states[special[0]][0];
 		var dy = states[special[1]][1] - states[special[0]][1];
@@ -983,12 +982,14 @@ function pointTowards()
 		{
 			alert("You can't share time or space at light speed!");
 			special.splice(0);
+			specialCap = 0;
+			btnPointTo.style.borderStyle = "outset";
 			update();
 			return;
 		}
 
 		//add frame
-		lockout = true;
+		//lockout = true;
 		states.push([states[special[0]][0], states[special[0]][1],
 				(Math.abs(dx) > Math.abs(dy) ? dy / dx : dx / dy)]);
 		edits.push([states[special[0]][0], states[special[0]][1],
@@ -997,8 +998,10 @@ function pointTowards()
 
 		//select the new frame
 		special.splice(0);
+		specialCap = 0;
+		btnPointTo.style.borderStyle = "outset";
 		updateRF(states.length);
-	}, 250);
+	}
 }
 
 /*
