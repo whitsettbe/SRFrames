@@ -160,6 +160,7 @@ handle refreshing and coordinate swapping from the top-level
 var states = [[0, 0, 0], [5, 0, -0.6]];
 var edits = [[0, 0, 0], [5, 0, -0.6]];
 var ticks = [true, true];
+var keepFrames = -1;
 var special = [];
 var specialCap = 0;
 
@@ -295,6 +296,7 @@ function load()
 function save()
 {
 	btnSave = document.getElementById("btnSave");
+	doLockout("btnSave", true);
 	if(getComputedStyle(btnSave).borderStyle === "outset")
 	{
 		document.getElementById("edits").style.display = "inline";
@@ -327,9 +329,9 @@ function save()
 			ticks[idx] = document.getElementById("ax").checked;
 			update();
 		}
-
-		document.getElementById("edits").style.display = "none";
-		btnSave.style.borderStyle = "outset";
+		cancel();
+		//document.getElementById("edits").style.display = "none";
+		//btnSave.style.borderStyle = "outset";
 	}
 }
 
@@ -337,6 +339,7 @@ function save()
 function saveNew()
 {
 	btnSaveNew = document.getElementById("btnSaveNew");
+	doLockout("btnSaveNew", true);
 	if(getComputedStyle(btnSaveNew).borderStyle === "outset")
 	{
 		document.getElementById("edits").style.display = "inline";
@@ -358,8 +361,9 @@ function saveNew()
 		ticks.push(document.getElementById("ax").checked);
 		updateRF(toFloat(states.length));
 
-		document.getElementById("edits").style.display = "none";
-		btnSaveNew.style.borderStyle = "outset";
+		cancel();
+		//document.getElementById("edits").style.display = "none";
+		//btnSaveNew.style.borderStyle = "outset";
 	}
 }
 
@@ -414,7 +418,8 @@ document.getElementById("btnImport").addEventListener("click", function()
 }, false);
 
 //file opener
-document.getElementById("import").addEventListener('change', function()
+document.getElementById("import").addEventListener('change', importchangeFn, false);
+function importchangeFn()
 {
 	var fr=new FileReader();
 	fr.onload=function()
@@ -461,7 +466,7 @@ document.getElementById("import").addEventListener('change', function()
 		fr.readAsText(this.files[0]);
 	}
 
-});
+}
 
 function fileSave()
 {
@@ -503,7 +508,7 @@ var ZOOM_FACTOR = 1.07;
 var oldMouseX = 0, oldMouseY = 0;
 var mouseMode = 0;
 var MOUSE_TIMEOUT = 1000;
-//var lockout = false;
+var lockout = false;
 
 //distance from a point (two coords) to a line (two coords per defining point)
 function ptLineDist(x0, y0, x1, y1, x2, y2)
@@ -616,7 +621,8 @@ function zoom(event, pwr)
 }
 
 //on mouse move: highlight closest element, drag if mouse down
-canv.addEventListener("mousemove", function(event)
+canv.addEventListener("mousemove", mousemoveFn, false);
+function mousemoveFn(event)
 {
 	mouseMode = (new Date()).getTime();
 
@@ -626,7 +632,7 @@ canv.addEventListener("mousemove", function(event)
 	canv.style.cursor = "default";
 
 	//highlights
-	if(/*!lockout && */event.buttons & LEFT > 0)
+	if(!lockout && event.buttons & LEFT > 0)
 		showClose(event);
 
 	//drag panning
@@ -636,10 +642,11 @@ canv.addEventListener("mousemove", function(event)
 	//update most recent location
 	oldMouseX = x;
 	oldMouseY = y;
-}, false);
+}
 
 //on mouse down: (mouse move behavior)
-canv.addEventListener("mousedown", function(event)
+canv.addEventListener("mousedown", mousedownFn, false);
+function mousedownFn(event)
 {
 	mouseMode = (new Date()).getTime();
 
@@ -648,31 +655,31 @@ canv.addEventListener("mousedown", function(event)
 	var y = event.pageY - canvRect.top;
 
 	//highlights
-	//if(!lockout)
+	if(!lockout)
 		showClose(event);
 
 	//update most recent location
 	oldMouseX = x;
 	oldMouseY = y;
-}, false);
+}
 
 //on mouse scroll: zoom on mouse center
-canv.addEventListener("wheel", function(event)
+canv.addEventListener("wheel", wheelFn, false);
+function wheelFn(event)
 {
 	mouseMode = (new Date()).getTime();
-//alert(event.deltaMode);
+
 	//if scroll up (-) zoom in, else zoom out
 	zoom(event, event.deltaY < 0 ? -1 : 1);
 
 	//don't actually scroll
 	event.preventDefault();
 	return false;
-}, false);
+}
 
 //on mouse up: unlock mouse controls
 canv.addEventListener("mouseup", function(event)
 {
-	//lockout = false;
 	canv.style.cursor = "default";
 }, false);
 
@@ -683,7 +690,8 @@ var pointCache = new Array();
 var prevPtrGap = 0;
 
 //register new pointer
-canv.addEventListener("pointerdown", function(event)
+canv.addEventListener("pointerdown", pointerdownFn, false);
+function pointerdownFn(event)
 {
 	//prevent mouse confusion
 	if((new Date()).getTime() - mouseMode < MOUSE_TIMEOUT) return;
@@ -703,17 +711,16 @@ canv.addEventListener("pointerdown", function(event)
 	oldMouseY /= pointCache.length;
 
 	//update highlights and finish saving coordinates
-	//if(!lockout)
+	if(!lockout)
 		showClose({pageX: oldMouseX, pageY: oldMouseY});
 	oldMouseX -= canvRect.left;
 	oldMouseY -= canvRect.top;
-}, false);
+}
 
 //update moving pointer
-canv.addEventListener("pointermove", function(event)
+canv.addEventListener("pointermove", pointermoveFn, false);
+function pointermoveFn(event)
 {
-	//if(lockout) return;
-
 	//prevent mouse confusion
 	if((new Date()).getTime() - mouseMode < MOUSE_TIMEOUT) return;
 	if(pointCache.length == 0) return;
@@ -735,7 +742,6 @@ canv.addEventListener("pointermove", function(event)
 		var ptrGap = Math.sqrt(Math.pow(pointCache[0].pageX - pointCache[1].pageX, 2) +
 				Math.pow(pointCache[0].pageY - pointCache[1].pageY, 2));
 		if(prevPtrGap == 0) prevPtrGap = ptrGap;
-		//alert([prevPtrGap, ptrGap, Math.log(prevPtrGap / ptrGap), Math.log(prevPtrGap / ptrGap) / Math.log(ZOOM_FACTOR)]);
 		zoom({pageX: (pointCache[0].pageX + pointCache[1].pageX) / 2,
 				pageY: (pointCache[0].pageY + pointCache[1].pageY) / 2},
 				Math.log(prevPtrGap / ptrGap) / Math.log(ZOOM_FACTOR));
@@ -754,21 +760,16 @@ canv.addEventListener("pointermove", function(event)
 	pan({pageX: ptrX, pageY: ptrY});
 
 	//update highlights and finish saving coordinates
-	if(pointCache.length == 1/* && !lockout*/) showClose({pageX: ptrX, pageY: ptrY});
+	if(pointCache.length == 1 && !lockout) showClose({pageX: ptrX, pageY: ptrY});
 	oldMouseX = ptrX - canvRect.left;
 	oldMouseY = ptrY - canvRect.top;
 
-}, false);
+}
 
 //unregister removed pointers
-canv.addEventListener("pointerup", function(event)
+canv.addEventListener("pointerup", pointerupFn, false);
+function pointerupFn(event)
 {
-	//if(lockout)
-	//{
-	//	pointCache.splice(0);
-	//}
-	//lockout = false;
-
 	//prevent mouse confusion
 	if((new Date()).getTime() - mouseMode < MOUSE_TIMEOUT) return;
 	event.preventDefault();
@@ -798,16 +799,17 @@ canv.addEventListener("pointerup", function(event)
 	oldMouseY /= pointCache.length;
 
 	//update highlights and finish saving coordinates
-	if(pointCache.length > 0) showClose({pageX: oldMouseX, pageY: oldMouseY});
+	if(pointCache.length > 0 && !lockout) showClose({pageX: oldMouseX, pageY: oldMouseY});
 	oldMouseX -= canvRect.left;
 	oldMouseY -= canvRect.top;
-}, false);
+}
 
 /*
 new interface mechanics (making use of mouse interaction)
 */
 
 var refUpdate = 0, refUpdateSpecial = 0;
+var oldRefVal = 1;
 
 //collect all update functions in a single call
 function update()
@@ -826,22 +828,29 @@ function updateRF(newVal)
 }
 
 //automatically load on user-driven RF# change
-document.getElementById("ref").addEventListener("change", function()
+document.getElementById("ref").addEventListener("change", refchangeFn, false);
+function refchangeFn()
 {
 	if(this.value.length < 1) this.value = 1;
 	if(this.value.indexOf(".") >= 0) this.value = this.value.split(".")[0];
 	if(toFloat(this.value) - states.length > TOL) this.value = states.length;
 	if(toFloat(this.value) < 1) this.value = 1;
-	update();
-	refUpdate += 1;
-	checkSpecial();
-}, false);
+	
+	if(lockout) this.value = oldRefVal + 1;
+	else
+	{
+		oldRefVal = toFloat(this.value);
+		update();
+		refUpdate += 1;
+		checkSpecial();
+	}
+}
 
 //check the selected frame for special-ness and store if needed
 function checkSpecial()
 {
 	if(refUpdate == refUpdateSpecial) return; //don't update until user finishes entering number
-	//(@@ could cause lockout sometimes...)
+	//(@@ not sure I trust this check against false exits...)
 	refUpdateSpecial = refUpdate;
 	var val = toFloat(document.getElementById("ref").value) - 1;
 	var old = false;
@@ -864,12 +873,11 @@ function linSolve(x0, y0, m0, x1, y1, m1)
 	return [toFloat((a - b) / (ma - mb)), toFloat((b * ma - a * mb) / (ma - mb))];
 }
 
-//alert(linSolve(5, -5.5, 1/-0.6, 0, 0, 0).join());
-
 //allow selection of new intersect frames
 function intersect()
 {
 	btnIntersect = document.getElementById("btnIntersect");
+	doLockout("btnIntersect", false);
 	if(getComputedStyle(btnIntersect).borderStyle === "outset")
 	{
 		specialCap = 2;
@@ -877,7 +885,7 @@ function intersect()
 	}
 	else if(special.length == specialCap && specialCap == 2)
 	{
-		oldLen = states.length;
+		keepFrames = states.length;
 		//try x-x intersect
 		newLocs = [];
 		if(Math.abs(states[special[0]][2] - states[special[1]][2]) > TOL)
@@ -892,9 +900,6 @@ function intersect()
 				(Math.abs(states[special[1]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[1]][2])));
 
 		//try t-x intersect
-		//alert([states[special[0]][0], states[special[0]][1],
-		//		(states[special[0]][2] < TOL ? 1 / TOL / TOL : 1 / states[special[0]][2]),
-		//		states[special[1]][0], states[special[1]][1], states[special[1]][2]].join('\n'));
 		newLocs.push(linSolve(states[special[0]][0], states[special[0]][1],
 				(Math.abs(states[special[0]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[0]][2]),
 				states[special[1]][0], states[special[1]][1], states[special[1]][2]));
@@ -908,9 +913,8 @@ function intersect()
 					states[special[1]][0], states[special[1]][1],
 					(Math.abs(states[special[1]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[1]][2])));
 		}
-//alert([special, states[0], states[1], newLocs].join('\n'));
+
 		//add new intersect frames (temporarily)
-		//lockout = true;
 		for(var i = 0; i < newLocs.length; i++)
 		{
 			for(var j = 0; j < 2; j++)
@@ -940,26 +944,21 @@ function intersect()
 	}
 	else if(special.length == specialCap && specialCap == 3)
 	{
-		/*if(special[2] < oldLen)
-		{
-			special.splice(2);
-			update();
-			return;
-		}*/
-
 		//save the selected frame and delete others
-		[states[oldLen], states[special[2]]] = [states[special[2]], states[oldLen]];
-		[edits[oldLen], edits[special[2]]] = [edits[special[2]], edits[oldLen]];
-		[ticks[oldLen], ticks[special[2]]] = [ticks[special[2]], ticks[oldLen]];
-		states.splice(oldLen + 1);
-		edits.splice(oldLen + 1);
-		ticks.splice(oldLen + 1);
+		[states[keepFrames], states[special[2]]] = [states[special[2]], states[keepFrames]];
+		[edits[keepFrames], edits[special[2]]] = [edits[special[2]], edits[keepFrames]];
+		[ticks[keepFrames], ticks[special[2]]] = [ticks[special[2]], ticks[keepFrames]];
+		keepFrames += 1;
+		/*states.splice(keepFrames + 1);
+		edits.splice(keepFrames + 1);
+		ticks.splice(keepFrames + 1);*/
 
 		//clear special and redraw
-		special.splice(0);
-		updateRF(oldLen + 1);
+		/*special.splice(0);
+		updateRF(keepFrames + 1);
 
-		specialCap = 0;
+		specialCap = 0;*/
+		cancel();
 		btnIntersect.style.borderStyle = "outset";
 	}
 }
@@ -968,6 +967,7 @@ function intersect()
 function pointTowards()
 {
 	btnPointTo = document.getElementById("btnPointTo");
+	doLockout("btnPointTo", false);
 	if(getComputedStyle(btnPointTo).borderStyle === "outset")
 	{
 		specialCap = 2;
@@ -989,7 +989,6 @@ function pointTowards()
 		}
 
 		//add frame
-		//lockout = true;
 		states.push([states[special[0]][0], states[special[0]][1],
 				(Math.abs(dx) > Math.abs(dy) ? dy / dx : dx / dy)]);
 		edits.push([states[special[0]][0], states[special[0]][1],
@@ -997,11 +996,58 @@ function pointTowards()
 		ticks.push(true);
 
 		//select the new frame
-		special.splice(0);
-		specialCap = 0;
-		btnPointTo.style.borderStyle = "outset";
+		cancel();
 		updateRF(states.length);
 	}
+}
+
+/*
+lockout/cancellation procedures
+*/
+
+var lockIds = "btnImport btnExport exportLink btnTransform btnRemove btnIntersect btnPointTo btnSave btnSaveNew";
+
+//lock all but the used button
+function doLockout(toKeep, stopMice = false)
+{
+	var locks = lockIds.split(' ');
+	for(var i = 0; i < locks.length; i++)
+	{
+		if(locks[i] != toKeep)
+		{
+			document.getElementById(locks[i]).disabled = true;
+		}
+	}
+	if(stopMice) lockout = true;
+}
+
+//unlock buttons and stop procedures
+function cancel()
+{
+	special.splice(0);
+	specialCap = 0;
+	var locks = lockIds.split(' ');
+	for(var i = 0; i < locks.length; i++)
+	{
+		document.getElementById(locks[i]).disabled = false;
+		document.getElementById(locks[i]).style.borderStyle = "outset";
+	}
+	lockout = false;
+	if(keepFrames != -1)
+	{
+		states.splice(keepFrames);
+		edits.splice(keepFrames);
+		ticks.splice(keepFrames);
+		if(toFloat(document.getElementById("ref").value) > keepFrames - 1)
+		{
+			updateRF(keepFrames);
+		}
+		else update();
+		keepFrames = -1;
+	}
+	else update();
+
+	document.getElementById("edits").style.display = "none";
 }
 
 /*
