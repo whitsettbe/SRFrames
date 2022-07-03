@@ -235,9 +235,9 @@ function animate(oldStates, basis, f)
 	else
 	{
 		update();
-		document.getElementById("xedit").value = 0;
-		document.getElementById("tedit").value = 0;
-		document.getElementById("vedit").value = 0;
+		//document.getElementById("xedit").value = 0;
+		//document.getElementById("tedit").value = 0;
+		//document.getElementById("vedit").value = 0;
 	}
 }
 
@@ -304,6 +304,7 @@ function save()
 	}
 	else
 	{
+		//@@pan/zoom resets these values to the selected frame
 		var idx = toFloat(document.getElementById("ref").value) - 1;
 		var x = toFloat(document.getElementById("xedit").value);
 		var t = toFloat(document.getElementById("tedit").value);
@@ -370,6 +371,7 @@ function saveNew()
 //choose the current editor space as a new reference frame basis and translate everything
 function transform()
 {
+	update();
 	basis = [toFloat(document.getElementById("xedit").value),
 			toFloat(document.getElementById("tedit").value),
 			toFloat(document.getElementById("vedit").value)];
