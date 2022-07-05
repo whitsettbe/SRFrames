@@ -100,27 +100,6 @@ function transform()
 	animate(oldStates, basis, 1);
 }
 
-//delete a reference frame
-function remove()
-{
-	var idx = toFloat(document.getElementById("ref").value) - 1;
-	if(idx < 0 || states.length <= idx || Math.abs(idx - Math.round(idx)) > TOL)
-	{
-		alert("Invalid reference frame index.");
-		return;
-	}
-	else if(confirm("Are you sure to PERMANENTLY delete reference frame "+(idx+1)+"?"))
-	{
-		states.splice(idx, 1);
-		edits.splice(idx, 1);
-		ticks.splice(idx, 1);
-		if(idx >= states.length)
-			update(idx - 1);
-		else
-			update();
-	}
-}
-
 /*
 handle exports/imports
 */

@@ -219,13 +219,13 @@ function refchangeFn()
 	if(toFloat(this.value) - states.length > TOL) this.value = states.length;
 	if(toFloat(this.value) < 1) this.value = 1;
 	
-	if(lockout) this.value = oldRefVal + 1;
+	if(lockout) this.value = oldRefVal;
 	else
 	{
 		oldRefVal = toFloat(this.value);
 		update();
 		refUpdate += 1;
-		checkSpecial();
+		if(special.length < specialCap) checkSpecial();
 	}
 }
 
