@@ -86,7 +86,6 @@ canv.addEventListener("mouseup", function(event)
 	canv.style.cursor = "default";
 }, false);
 
-
 /*
 touchscreen controls
 */
@@ -272,7 +271,6 @@ function showClose(event)
 	var r = 0;
 	for(var i = 0; i < states.length; i++)
 	{
-		//alert([i, x, xScale(states[i][0]), y, tScale(states[i][1])]);
 		r = Math.sqrt(Math.pow(x - xScale(states[i][0]), 2) + Math.pow(y - tScale(states[i][1]), 2));
 		if(xMin < states[i][0] && states[i][0] < xMax && tMin < states[i][1] && states[i][1] < tMax
 				&& r < PT_CLOSE && r < dist)

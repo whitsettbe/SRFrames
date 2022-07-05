@@ -4,7 +4,7 @@ var COORD_RAD = 4;
 var xMin = -10, xMax = 10, tMin = -10, tMax = 10;
 var xStep = 1, tStep = 1;
 var numDec = 4;
-var TOL = .000000000004;//Math.pow(2, -35);
+var TOL = .000000000004;
 var FRAMES = 20;
 var FRAME_GAP = 50;
 
@@ -62,9 +62,6 @@ function animate(oldStates, basis, f)
 	else
 	{
 		update();
-		//document.getElementById("xedit").value = 0;
-		//document.getElementById("tedit").value = 0;
-		//document.getElementById("vedit").value = 0;
 	}
 }
 
@@ -161,6 +158,7 @@ function importchangeFn()
 
 }
 
+//export as file
 function fileSave()
 {
 	var link = document.getElementById("exportLink");
@@ -189,21 +187,3 @@ function calcV()
 	var mx = Math.max(document.getElementById("d1").value, document.getElementById("d2").value);
 	document.getElementById("vcalc").value = Math.sqrt(1 - (mn * mn) / (mx * mx));
 }
-
-/*
-Mouse interaction
-*/
-
-/*
-pointer interaction to emulate mouse
-*/
-
-/*
-new interface mechanics (making use of mouse interaction)
-*/
-
-
-/*
-lockout/cancellation procedures
-*/
-

@@ -1,4 +1,3 @@
-
 //allow selection of new intersect frames
 function intersect()
 {
@@ -29,7 +28,6 @@ function intersect()
 		newLocs.push(linSolve(states[special[0]][0], states[special[0]][1],
 				(Math.abs(states[special[0]][2]) < TOL ? 1 / TOL / TOL : 1 / states[special[0]][2]),
 				states[special[1]][0], states[special[1]][1], states[special[1]][2]));
-		//alert(special.join());
 
 		//try t-t intersect
 		if(Math.abs(states[special[0]][2] - states[special[1]][2]) > TOL)
@@ -75,15 +73,7 @@ function intersect()
 		[edits[keepFrames], edits[special[2]]] = [edits[special[2]], edits[keepFrames]];
 		[ticks[keepFrames], ticks[special[2]]] = [ticks[special[2]], ticks[keepFrames]];
 		keepFrames += 1;
-		/*states.splice(keepFrames + 1);
-		edits.splice(keepFrames + 1);
-		ticks.splice(keepFrames + 1);*/
 
-		//clear special and redraw
-		/*special.splice(0);
-		updateRF(keepFrames + 1);
-
-		specialCap = 0;*/
 		cancel();
 		btnIntersect.style.borderStyle = "outset";
 	}
@@ -166,8 +156,6 @@ function save()
 			update();
 		}
 		cancel();
-		//document.getElementById("edits").style.display = "none";
-		//btnSave.style.borderStyle = "outset";
 	}
 }
 
@@ -198,8 +186,6 @@ function saveNew()
 		update(toFloat(states.length));
 
 		cancel();
-		//document.getElementById("edits").style.display = "none";
-		//btnSaveNew.style.borderStyle = "outset";
 	}
 }
 
