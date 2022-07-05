@@ -1,17 +1,20 @@
-//handle reference frame switches
-function updateRF(newVal)
-{
-	document.getElementById("ref").value = newVal;
-	update();
-	refUpdate += 1;
-}
-
 //collect all update functions in a single call
-function update()
+function update(newVal = document.getElementById("ref").value)
 {
-	load();
-	redraw();
-	relist();
+	if(newVal != document.getElementById("ref").value)
+	{
+		document.getElementById("ref").value = newVal;
+		load();
+		redraw();
+		relist();
+		refUpdate += 1;
+	}
+	else
+	{
+		load();
+		redraw();
+		relist();
+	}
 }
 
 /*
