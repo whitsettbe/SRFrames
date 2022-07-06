@@ -1,7 +1,7 @@
 //collect all update functions in a single call
-function update(newVal = document.getElementById("ref").value)
+function update(newVal = "")
 {
-	if(newVal != document.getElementById("ref").value)
+	if(newVal != "")
 	{
 		document.getElementById("ref").value = newVal;
 		load();

@@ -287,7 +287,8 @@ function showClose(event)
 		return;
 	}
 
-	dist = DIM * 2; closeLn = -1;
+	dist = DIM * 2;
+	var closeLn = -1;
 	for(var i = 0; i < states.length; i++)
 	{
 		//ensure defined at relevant point

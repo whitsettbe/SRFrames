@@ -124,32 +124,7 @@ function importchangeFn()
 			return;
 
 		//start loading
-		var text = fr.result;
-		var keys = text.substr(text.lastIndexOf("@\n") + 2).split(/\s+/).reverse();
-		xMin = toFloat(keys.pop()); xMax = toFloat(keys.pop());
-		tMin = toFloat(keys.pop()); tMax = toFloat(keys.pop());
-		xStep = toFloat(keys.pop()); tStep = toFloat(keys.pop());
-		var numFrame = Math.round(toFloat(keys.pop()));
-		states = []; edits = []; ticks = [];
-
-		//get reference frame lines
-		for(var i = 0; i < numFrame; i++)
-		{
-			ticks.push(Number.parseInt(keys.pop()) == 1);
-			states.push([]);
-			states[i].push(toFloat(keys.pop()));
-			states[i].push(toFloat(keys.pop()));
-			states[i].push(toFloat(keys.pop()));
-			edits.push([]);
-			edits[i].push(toFloat(keys.pop()));
-			edits[i].push(toFloat(keys.pop()));
-			edits[i].push(toFloat(keys.pop()));
-		}
-
-		//update notes and refresh
-		document.getElementById("notes").value = text.substr(0, text.lastIndexOf('@'));
-		document.getElementById("import").value = "";
-		update(1);
+		fromText(fr.result);
 	}
 	if(this.files.length > 0)
 	{
@@ -162,6 +137,18 @@ function importchangeFn()
 function fileSave()
 {
 	var link = document.getElementById("exportLink");
+	var data = new Blob([toText()], {type: 'text/plain'});
+	link.href = window.URL.createObjectURL(data);
+	link.click();
+	return false;
+}
+
+/*
+convert program info to text
+*/
+
+function toText()
+{
 	var text = document.getElementById("notes").value + "@\n";
 	text += xMin + " " + xMax + " " + tMin + " " + tMax + " " + xStep + " " + tStep + "\n";
 	text += states.length + "\n";
@@ -169,10 +156,36 @@ function fileSave()
 		text += (ticks[i] ? 1 : 0) + " " + toFloat(states[i][0]) + " " + toFloat(states[i][1]) + " " +
 				toFloat(states[i][2]) + " " + toFloat(edits[i][0]) + " " + toFloat(edits[i][1]) + " " +
 				toFloat(edits[i][2]) + "\n";
-	var data = new Blob([text], {type: 'text/plain'});
-	link.href = window.URL.createObjectURL(data);
-	link.click();
-	return false;
+	return text;
+}
+
+function fromText(text)
+{
+	var keys = text.substr(text.lastIndexOf("@\n") + 2).split(/\s+/).reverse();
+	xMin = toFloat(keys.pop()); xMax = toFloat(keys.pop());
+	tMin = toFloat(keys.pop()); tMax = toFloat(keys.pop());
+	xStep = toFloat(keys.pop()); tStep = toFloat(keys.pop());
+	var numFrame = Math.round(toFloat(keys.pop()));
+	states = []; edits = []; ticks = [];
+
+	//get reference frame lines
+	for(var i = 0; i < numFrame; i++)
+	{
+		ticks.push(Number.parseInt(keys.pop()) == 1);
+		states.push([]);
+		states[i].push(toFloat(keys.pop()));
+		states[i].push(toFloat(keys.pop()));
+		states[i].push(toFloat(keys.pop()));
+		edits.push([]);
+		edits[i].push(toFloat(keys.pop()));
+		edits[i].push(toFloat(keys.pop()));
+		edits[i].push(toFloat(keys.pop()));
+	}
+
+	//update notes and refresh
+	document.getElementById("notes").value = text.substr(0, text.lastIndexOf('@'));
+	document.getElementById("import").value = "";
+	update(1);//@@may want to switch to base frame instead of first frame
 }
 
 /*
