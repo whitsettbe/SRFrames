@@ -91,7 +91,7 @@ function redraw()
 	}
 
 	//load alternate settings for highlighted frame
-	ctx.lineWidth = oldLineWidth * 2;
+	ctx.lineWidth = oldLineWidth * 1.5;
 	ctx.strokeStyle = "#FF0000";
 	draw(states[parseInt(document.getElementById("ref").value) - 1], true, true, true, false,
 			ticks[parseInt(document.getElementById("ref").value) - 1]);

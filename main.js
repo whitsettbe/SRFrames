@@ -9,11 +9,6 @@ var TOL = .000000000004;
 var FRAMES = 20;
 var FRAME_GAP = 50;
 
-//undo/redo space
-var mem = [];
-var memTimeout = 0;
-var MEM_GAP = 1000;
-
 //canvas setup
 var canv = document.getElementById("myCanvas");
 canv.setAttribute("width", DIM);
@@ -155,7 +150,12 @@ function fileSave()
 handle undo / redo behaviors
 */
 
-//automatic state-saving each second
+//undo/redo space
+var mem = [];
+var memTimeout = 0;
+var MEM_GAP = 200;
+
+//automatic state-saving
 setInterval(function()
 {
 	text = toText();
@@ -164,14 +164,14 @@ setInterval(function()
 	{
 		mem.push(text);
 	}
-}, 1000);
+}, 200);
 
 //how to undo
 document.getElementById("btnUndo").addEventListener("click", undo, false);
 function undo()
 {
 	memTimeout = (new Date()).getTime();
-	if(mem.length > 1 && toText() === mem[mem.length - 1])
+	if(specialCap == 0 && mem.length > 1 && toText() === mem[mem.length - 1])
 	{
 		mem.pop();
 		fromText(mem[mem.length - 1]);
@@ -181,6 +181,18 @@ function undo()
 		fromText(mem[mem.length - 1]);
 	}
 }
+
+//process undo / redo key input
+document.body.addEventListener('keydown', function(e)
+{
+	//update document history
+	if(e.key == "z" && e.ctrlKey == true)
+	{
+		e.preventDefault();
+		undo();
+	}
+	
+}, false);
 
 /*
 convert program info to text
@@ -228,6 +240,7 @@ function fromText(text)
 	//update notes and refresh
 	document.getElementById("notes").value = text.substr(0, text.lastIndexOf('@'));
 	document.getElementById("import").value = "";
+	cancel();
 	update(1);//@@may want to switch to base frame instead of first frame
 }
 

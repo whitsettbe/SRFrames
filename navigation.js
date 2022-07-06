@@ -42,7 +42,7 @@ function mousemoveFn(event)
 	if(event.buttons & LEFT > 0)
 	{
 		pan(event);
-		memHold = (new Date()).getTime();
+		memTimeout = (new Date()).getTime();
 	}
 
 	//update most recent location
@@ -77,7 +77,7 @@ function wheelFn(event)
 
 	//if scroll up (-) zoom in, else zoom out
 	zoom(event, event.deltaY < 0 ? -1 : 1);
-	memHold = (new Date()).getTime();
+	memTimeout = (new Date()).getTime();
 
 	//don't actually scroll
 	event.preventDefault();
@@ -119,7 +119,7 @@ function pointerdownFn(event)
 	if(!lockout)
 	{
 		showClose({pageX: oldMouseX, pageY: oldMouseY});
-		memHold = (new Date()).getTime();
+		memTimeout = (new Date()).getTime();
 	}
 	oldMouseX -= canvRect.left;
 	oldMouseY -= canvRect.top;
@@ -155,7 +155,7 @@ function pointermoveFn(event)
 				Math.log(prevPtrGap / ptrGap) / Math.log(ZOOM_FACTOR));
 		prevPtrGap = ptrGap;
 
-		memHold = (new Date()).getTime();
+		memTimeout = (new Date()).getTime();
 	}
 
 	//create pannable mouse move event
@@ -173,7 +173,7 @@ function pointermoveFn(event)
 	if(pointCache.length == 1 && !lockout)
 	{
 		showClose({pageX: ptrX, pageY: ptrY});
-		memHold = (new Date()).getTime();
+		memTimeout = (new Date()).getTime();
 	}
 	oldMouseX = ptrX - canvRect.left;
 	oldMouseY = ptrY - canvRect.top;
@@ -216,7 +216,7 @@ function pointerupFn(event)
 	if(pointCache.length > 0 && !lockout)
 	{
 		showClose({pageX: oldMouseX, pageY: oldMouseY});
-		memHold = (new Date()).getTime();
+		memTimeout = (new Date()).getTime();
 	}
 	oldMouseX -= canvRect.left;
 	oldMouseY -= canvRect.top;
@@ -243,7 +243,7 @@ function refchangeFn()
 		refUpdate += 1;
 		if(special.length < specialCap) checkSpecial();
 	}
-	memHold = (new Date()).getTime();
+	memTimeout = (new Date()).getTime();
 }
 
 /*
