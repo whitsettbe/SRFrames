@@ -1,3 +1,4 @@
+//defining constants
 var DIM = Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.9);
 var PT_RAD = 5;
 var COORD_RAD = 4;
@@ -8,12 +9,19 @@ var TOL = .000000000004;
 var FRAMES = 20;
 var FRAME_GAP = 50;
 
+//undo/redo space
+var mem = [];
+var memTimeout = 0;
+var MEM_GAP = 1000;
+
+//canvas setup
 var canv = document.getElementById("myCanvas");
 canv.setAttribute("width", DIM);
 canv.setAttribute("height", DIM);
 var canvRect = canv.getBoundingClientRect();
 var ctx = canv.getContext("2d");
 
+//finish text editor formatting
 document.getElementById("notes").style.height = window.innerHeight * 0.4 + "px";
 
 //generate HTML in cell (coordinates, velocitites, and form)
@@ -144,6 +152,37 @@ function fileSave()
 }
 
 /*
+handle undo / redo behaviors
+*/
+
+//automatic state-saving each second
+setInterval(function()
+{
+	text = toText();
+	if(specialCap == 0 && ((new Date()).getTime() - memTimeout > MEM_GAP) &&
+			(mem.length == 0 || text !== mem[mem.length - 1]))
+	{
+		mem.push(text);
+	}
+}, 1000);
+
+//how to undo
+document.getElementById("btnUndo").addEventListener("click", undo, false);
+function undo()
+{
+	memTimeout = (new Date()).getTime();
+	if(mem.length > 1 && toText() === mem[mem.length - 1])
+	{
+		mem.pop();
+		fromText(mem[mem.length - 1]);
+	}
+	else if(mem.length > 0)
+	{
+		fromText(mem[mem.length - 1]);
+	}
+}
+
+/*
 convert program info to text
 */
 
@@ -162,9 +201,13 @@ function toText()
 function fromText(text)
 {
 	var keys = text.substr(text.lastIndexOf("@\n") + 2).split(/\s+/).reverse();
-	xMin = toFloat(keys.pop()); xMax = toFloat(keys.pop());
-	tMin = toFloat(keys.pop()); tMax = toFloat(keys.pop());
-	xStep = toFloat(keys.pop()); tStep = toFloat(keys.pop());
+	document.getElementById("xmin").value = toFloat(keys.pop());
+	document.getElementById("xmax").value = toFloat(keys.pop());
+	document.getElementById("tmin").value = toFloat(keys.pop());
+	document.getElementById("tmax").value = toFloat(keys.pop());
+	document.getElementById("xstep").value = toFloat(keys.pop());
+	document.getElementById("tstep").value = toFloat(keys.pop());
+	updateCoord();
 	var numFrame = Math.round(toFloat(keys.pop()));
 	states = []; edits = []; ticks = [];
 
