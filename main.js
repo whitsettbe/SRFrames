@@ -152,17 +152,20 @@ handle undo / redo behaviors
 
 //undo/redo space
 var mem = [];
+var memCap = 0;
 var memTimeout = 0;
-var MEM_GAP = 200;
+var MEM_GAP = 400;
 
 //automatic state-saving
 setInterval(function()
 {
 	text = toText();
 	if(specialCap == 0 && ((new Date()).getTime() - memTimeout > MEM_GAP) &&
-			(mem.length == 0 || text !== mem[mem.length - 1]))
+			(mem.length == 0 || text !== mem[memCap - 1]))
 	{
+		mem.splice(memCap);
 		mem.push(text);
+		memCap++;
 	}
 }, 200);
 
@@ -170,15 +173,27 @@ setInterval(function()
 document.getElementById("btnUndo").addEventListener("click", undo, false);
 function undo()
 {
-	memTimeout = (new Date()).getTime();
-	if(specialCap == 0 && mem.length > 1 && toText() === mem[mem.length - 1])
+	//memTimeout = (new Date()).getTime();
+	if(specialCap == 0 && memCap > 1)// && toText() === mem[memCap - 1])
 	{
-		mem.pop();
-		fromText(mem[mem.length - 1]);
+		//mem.pop();
+		memCap--;
+		fromText(mem[memCap - 1]);
 	}
-	else if(mem.length > 0)
+	/*else if(memCap > 0)
 	{
-		fromText(mem[mem.length - 1]);
+		fromText(mem[memCap - 1]);
+	}*/
+}
+
+//how to redo
+document.getElementById("btnRedo").addEventListener("click", redo, false);
+function redo()
+{
+	if(specialCap == 0 && memCap < mem.length)
+	{
+		memCap++;
+		fromText(mem[memCap - 1]);
 	}
 }
 
@@ -186,12 +201,17 @@ function undo()
 document.body.addEventListener('keydown', function(e)
 {
 	//update document history
-	if(e.key == "z" && e.ctrlKey == true)
+	if(e.key.toLowerCase() == "z" && e.ctrlKey && !e.shiftKey)
 	{
 		e.preventDefault();
 		undo();
 	}
-	
+	else if(e.key.toLowerCase() == "y" && e.ctrlKey && !e.shiftKey
+			|| e.key.toLowerCase() == "z" && e.ctrlKey && e.shiftKey)
+	{
+		e.preventDefault();
+		redo();
+	}
 }, false);
 
 /*
@@ -240,8 +260,8 @@ function fromText(text)
 	//update notes and refresh
 	document.getElementById("notes").value = text.substr(0, text.lastIndexOf('@'));
 	document.getElementById("import").value = "";
-	cancel();
 	update(1);//@@may want to switch to base frame instead of first frame
+	cancel();
 }
 
 /*
