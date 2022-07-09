@@ -131,9 +131,9 @@ function save()
 	{
 		//@@pan/zoom resets these values to the selected frame
 		var idx = toFloat(document.getElementById("ref").value) - 1;
-		var x = toFloat(document.getElementById("xedit").value);
-		var t = toFloat(document.getElementById("tedit").value);
-		var v = toFloat(document.getElementById("vedit").value);
+		var x = getEdit("x");
+		var t = getEdit("t");
+		var v = getEdit("v");
 		if(idx < 0 || states.length <= idx || Math.abs(idx - Math.round(idx)) > TOL)
 		{
 			alert("Invalid reference frame index.");
@@ -152,7 +152,7 @@ function save()
 			states[idx][0] = x; edits[idx][0] = x;
 			states[idx][1] = t; edits[idx][1] = t;
 			states[idx][2] = v; edits[idx][2] = v;
-			ticks[idx] = document.getElementById("ax").checked;
+			ticks[idx] = getEdit("ax");
 			update();
 		}
 		cancel();
@@ -176,13 +176,9 @@ function saveNew()
 			alert("Superluminal speeds not allowed");
 			return;
 		}
-		states.push([toFloat(document.getElementById("xedit").value),
-				toFloat(document.getElementById("tedit").value),
-				toFloat(document.getElementById("vedit").value)]);
-		edits.push([toFloat(document.getElementById("xedit").value),
-				toFloat(document.getElementById("tedit").value),
-				toFloat(document.getElementById("vedit").value)]);
-		ticks.push(document.getElementById("ax").checked);
+		states.push([getEdit("x"), getEdit("t"), getEdit("v")]);
+		edits.push([getEdit("x"), getEdit("t"), getEdit("v")]);
+		ticks.push(getEdit("ax"));
 		update(toFloat(states.length));
 
 		cancel();

@@ -47,10 +47,10 @@ function load()
 	var idx = toFloat(document.getElementById("ref").value) - 1;
 	if(0 <= idx && idx < states.length && Math.abs(idx - Math.round(idx)) < TOL)
 	{
-		document.getElementById("xedit").value = toFloat(states[idx][0]);
-		document.getElementById("tedit").value = toFloat(states[idx][1]);
-		document.getElementById("vedit").value = toFloat(states[idx][2]);
-		document.getElementById("ax").checked = ticks[idx];
+		setEdit("x", states[idx][0]);
+		setEdit("t", states[idx][1]);
+		setEdit("v", states[idx][2]);
+		setEdit("ax", ticks[idx]);
 	}
 	else
 	{

@@ -86,9 +86,7 @@ function transform()
 {
 	memTimeout = (new Date()).getTime();
 	update();
-	basis = [toFloat(document.getElementById("xedit").value),
-			toFloat(document.getElementById("tedit").value),
-			toFloat(document.getElementById("vedit").value)];
+	basis = [getEdit("x"), getEdit("t"), getEdit("v")];
 	if(Math.abs(basis[2]) >= 1)
 	{
 		alert("Superluminal speeds not allowed");
@@ -277,4 +275,43 @@ function calcV()
 	var mn = Math.min(document.getElementById("d1").value, document.getElementById("d2").value);
 	var mx = Math.max(document.getElementById("d1").value, document.getElementById("d2").value);
 	document.getElementById("vcalc").value = Math.sqrt(1 - (mn * mn) / (mx * mx));
+}
+
+/*
+handle scaling in the interface
+*/
+
+var xFactor = 1;
+var tFactor = 1;
+
+//retrieve from the edit boxes, unscaling as we go
+function getEdit(mode)
+{
+	switch(mode)
+	{
+		case "x":
+			return toFloat(document.getElementById("xedit").value) / xFactor;
+		case "t":
+			return toFloat(document.getElementById("tedit").value) / tFactor;
+		case "v":
+			return toFloat(document.getElementById("vedit").value) * tFactor / xFactor;
+		case "ax":
+			return document.getElementById("ax").checked;
+	}
+}
+
+//set the edit boxes, scaling as we go
+function setEdit(mode, value)
+{
+	switch(mode)
+	{
+		case "x":
+			document.getElementById("xedit").value = toFloat(value * xFactor);
+		case "t":
+			document.getElementById("tedit").value = toFloat(value * tFactor);
+		case "v":
+			document.getElementById("vedit").value = toFloat(value * xFactor / tFactor);
+		case "ax":
+			document.getElementById("ax").checked = value;
+	}
 }
