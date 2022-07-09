@@ -56,6 +56,7 @@ var specialCap = 0;
 //animate a coordinate transition
 function animate(oldStates, basis, f)
 {
+	memTimeout = (new Date()).getTime();
 	for(var i = 0; i < oldStates.length; i++)
 	{
 		states[i] = trans(oldStates[i], [basis[0] * f / FRAMES, basis[1] * f / FRAMES, basis[2] * f / FRAMES]);
@@ -83,6 +84,7 @@ function decimals(change)
 //choose the current editor space as a new reference frame basis and translate everything
 function transform()
 {
+	memTimeout = (new Date()).getTime();
 	update();
 	basis = [toFloat(document.getElementById("xedit").value),
 			toFloat(document.getElementById("tedit").value),
