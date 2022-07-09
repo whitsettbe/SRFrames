@@ -54,15 +54,25 @@ var special = [];
 var specialCap = 0;
 
 //animate a coordinate transition
-function animate(oldStates, basis, f)
+function animate(oldStates, basis, oldBBox, f)
 {
 	memTimeout = (new Date()).getTime();
 	for(var i = 0; i < oldStates.length; i++)
 	{
-		states[i] = trans(oldStates[i], [basis[0] * f / FRAMES, basis[1] * f / FRAMES, basis[2] * f / FRAMES]);
+		states[i] = trans(oldStates[i],
+				[basis[0] * f / FRAMES, basis[1] * f / FRAMES, basis[2] * f / FRAMES]);
 	}
+	document.getElementById("xmin").value =
+			toFloat(oldBBox[0] - (oldBBox[0] + oldBBox[1]) / 2 * Math.pow(f / FRAMES, 2));
+	document.getElementById("xmax").value =
+			toFloat(oldBBox[1] - (oldBBox[0] + oldBBox[1]) / 2 * Math.pow(f / FRAMES, 2));
+	document.getElementById("tmin").value =
+			toFloat(oldBBox[2] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2));
+	document.getElementById("tmax").value =
+			toFloat(oldBBox[3] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2));
+	updateCoord();
 	update();
-	if(f < FRAMES) setTimeout(function(){animate(oldStates, basis, f + 1);}, FRAME_GAP);
+	if(f < FRAMES) setTimeout(function(){animate(oldStates, basis, oldBBox, f + 1);}, FRAME_GAP);
 	else
 	{
 		update();
@@ -97,7 +107,7 @@ function transform()
 	{
 		oldStates.push(states[i]);
 	}
-	animate(oldStates, basis, 1);
+	animate(oldStates, basis, [xMin, xMax, tMin, tMax], 1);
 }
 
 /*
