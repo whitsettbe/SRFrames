@@ -34,10 +34,10 @@ function updateCoord()
 		xMax = parseFloat(document.getElementById("xmax").value);
 		tMin = parseFloat(document.getElementById("tmin").value);
 		tMax = parseFloat(document.getElementById("tmax").value);
-		document.getElementById("xstep").value = expNot(Math.pow(10, Math.round(Math.log(
-				scaleIn("x", xMax - xMin) / 2) / Math.log(10)) - 1));
-		document.getElementById("tstep").value = expNot(Math.pow(10, Math.round(Math.log(
-				scaleIn("t", tMax - tMin) / 2) / Math.log(10)) - 1));
+		document.getElementById("xstep").value = (Math.pow(10, Math.round(Math.log(
+				scaleIn("x", xMax - xMin) / 2) / Math.log(10)) - 1)).toExponential();
+		document.getElementById("tstep").value = (Math.pow(10, Math.round(Math.log(
+				scaleIn("t", tMax - tMin) / 2) / Math.log(10)) - 1)).toExponential();
 		xStep = parseFloat(document.getElementById("xstep").value);
 		tStep = parseFloat(document.getElementById("tstep").value);
 		//update();
@@ -52,7 +52,7 @@ function updateCoord()
 //re-list numbers in the reference frame list
 function relist()
 {
-	//catch not enough decimals
+	/*//catch not enough decimals
 	for(var i = 0; i < states.length; i++)
 	{
 		if(parseInt(Math.log10(Math.abs(scaleIn("x", states[i][0])))) > numDec)
@@ -61,7 +61,7 @@ function relist()
 			numDec = parseInt(Math.log10(Math.abs(scaleIn("t", states[i][1]))));
 		if(parseInt(Math.log10(Math.abs(scaleIn("v", states[i][2])))) > numDec)
 			numDec = parseInt(Math.log10(Math.abs(scaleIn("v", states[i][2]))));
-	}
+	}*/
 
 	var out = "<pre>  #  +  x"+" ".repeat(numDec + 1)+"  t"+" ".repeat(numDec + 1)+"  v<br>";
 	for(var i = 0; i < states.length; i++)
@@ -77,8 +77,8 @@ function relist()
 //format number for printing
 function numForm(num)
 {
-	var out = parseFloat(num).toFixed(numDec);
-	return ((out.startsWith("-") ? "" : " ") + out).substr(0, 3 + numDec);
+	var out = parseFloat(num).toExponential(numDec);
+	return ((out.startsWith("-") ? "" : " ") + out);//.substr(0, 3 + numDec);
 }
 
 //pull frame info from the form's frame index

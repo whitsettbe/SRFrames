@@ -20,13 +20,13 @@ function setEdit(mode, value)
 	if(mode === "ax")
 		document.getElementById("ax").checked = value;
 	else if(Math.abs(value) > TOL)
-		document.getElementById(mode + "edit").value = expNot(scaleIn(mode, value));
+		document.getElementById(mode + "edit").value = expRound(scaleIn(mode, value));
 	else
-		document.getElementById(mode +"edit").value = "0e0";
+		document.getElementById(mode +"edit").value = "0e+0";
 }
 
 //convert to exponential notation, with tolerance filter
-function expNot(val)
+function expRound(val)
 {
 	var pwr = Math.floor(Math.log10(Math.abs(val)));
 	val /= Math.pow(10, pwr);
