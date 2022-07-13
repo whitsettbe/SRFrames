@@ -1,3 +1,5 @@
+//@@toFloat needed in file retrieval?
+
 //defining constants
 var DIM = Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.9);
 var PT_RAD = 5;
@@ -63,13 +65,13 @@ function animate(oldStates, basis, oldBBox, f)
 				[basis[0] * f / FRAMES, basis[1] * f / FRAMES, basis[2] * f / FRAMES]);
 	}
 	document.getElementById("xmin").value =
-			toFloat(oldBBox[0] - (oldBBox[0] + oldBBox[1]) / 2 * Math.pow(f / FRAMES, 2));
+			parseFloat(oldBBox[0] - (oldBBox[0] + oldBBox[1]) / 2 * Math.pow(f / FRAMES, 2));
 	document.getElementById("xmax").value =
-			toFloat(oldBBox[1] - (oldBBox[0] + oldBBox[1]) / 2 * Math.pow(f / FRAMES, 2));
+			parseFloat(oldBBox[1] - (oldBBox[0] + oldBBox[1]) / 2 * Math.pow(f / FRAMES, 2));
 	document.getElementById("tmin").value =
-			toFloat(oldBBox[2] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2));
+			parseFloat(oldBBox[2] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2));
 	document.getElementById("tmax").value =
-			toFloat(oldBBox[3] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2));
+			parseFloat(oldBBox[3] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2));
 	update();
 	if(f < FRAMES) setTimeout(function(){animate(oldStates, basis, oldBBox, f + 1);}, FRAME_GAP);
 	else
@@ -95,6 +97,7 @@ function transform()
 {
 	memTimeout = (new Date()).getTime();
 	update();
+	load();
 	basis = [getEdit("x"), getEdit("t"), getEdit("v")];
 	if(Math.abs(basis[2]) >= 1)
 	{
@@ -233,23 +236,23 @@ function toText()
 	text += xMin + " " + xMax + " " + tMin + " " + tMax + " " + xStep + " " + tStep + "\n";
 	text += states.length + "\n";
 	for(var i = 0; i < states.length; i++)
-		text += (ticks[i] ? 1 : 0) + " " + toFloat(states[i][0]) + " " + toFloat(states[i][1]) + " " +
-				toFloat(states[i][2]) + " " + toFloat(edits[i][0]) + " " + toFloat(edits[i][1]) + " " +
-				toFloat(edits[i][2]) + "\n";
+		text += (ticks[i] ? 1 : 0) + " " + parseFloat(states[i][0]) + " " + parseFloat(states[i][1]) + " " +
+				parseFloat(states[i][2]) + " " + parseFloat(edits[i][0]) + " " + parseFloat(edits[i][1]) + " " +
+				parseFloat(edits[i][2]) + "\n";
 	return text;
 }
 
 function fromText(text)
 {
 	var keys = text.substr(text.lastIndexOf("@\n") + 2).split(/\s+/).reverse();
-	document.getElementById("xmin").value = toFloat(keys.pop());
-	document.getElementById("xmax").value = toFloat(keys.pop());
-	document.getElementById("tmin").value = toFloat(keys.pop());
-	document.getElementById("tmax").value = toFloat(keys.pop());
-	document.getElementById("xstep").value = toFloat(keys.pop());
-	document.getElementById("tstep").value = toFloat(keys.pop());
+	document.getElementById("xmin").value = parseFloat(keys.pop());
+	document.getElementById("xmax").value = parseFloat(keys.pop());
+	document.getElementById("tmin").value = parseFloat(keys.pop());
+	document.getElementById("tmax").value = parseFloat(keys.pop());
+	document.getElementById("xstep").value = parseFloat(keys.pop());
+	document.getElementById("tstep").value = parseFloat(keys.pop());
 	update();
-	var numFrame = Math.round(toFloat(keys.pop()));
+	var numFrame = Math.round(parseFloat(keys.pop()));
 	states = []; edits = []; ticks = [];
 
 	//get reference frame lines
@@ -257,13 +260,13 @@ function fromText(text)
 	{
 		ticks.push(Number.parseInt(keys.pop()) == 1);
 		states.push([]);
-		states[i].push(toFloat(keys.pop()));
-		states[i].push(toFloat(keys.pop()));
-		states[i].push(toFloat(keys.pop()));
+		states[i].push(parseFloat(keys.pop()));
+		states[i].push(parseFloat(keys.pop()));
+		states[i].push(parseFloat(keys.pop()));
 		edits.push([]);
-		edits[i].push(toFloat(keys.pop()));
-		edits[i].push(toFloat(keys.pop()));
-		edits[i].push(toFloat(keys.pop()));
+		edits[i].push(parseFloat(keys.pop()));
+		edits[i].push(parseFloat(keys.pop()));
+		edits[i].push(parseFloat(keys.pop()));
 	}
 
 	//update notes and refresh

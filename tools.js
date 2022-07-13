@@ -124,13 +124,14 @@ function save()
 	doLockout("btnSave", true);
 	if(getComputedStyle(btnSave).borderStyle === "outset")
 	{
+		load();
 		document.getElementById("edits").style.display = "inline";
 		btnSave.style.borderStyle = "inset";
 	}
 	else
 	{
 		//@@pan/zoom resets these values to the selected frame
-		var idx = parseFloat(document.getElementById("ref").value) - 1;
+		var idx = parseInt(document.getElementById("ref").value) - 1;
 		var x = getEdit("x");
 		var t = getEdit("t");
 		var v = getEdit("v");
@@ -166,6 +167,7 @@ function saveNew()
 	doLockout("btnSaveNew", true);
 	if(getComputedStyle(btnSaveNew).borderStyle === "outset")
 	{
+		load();
 		document.getElementById("edits").style.display = "inline";
 		btnSaveNew.style.borderStyle = "inset";
 	}
@@ -188,7 +190,7 @@ function saveNew()
 //delete a reference frame
 function remove()
 {
-	var idx = parseFloat(document.getElementById("ref").value) - 1;
+	var idx = parseInt(document.getElementById("ref").value) - 1;
 	if(states.length == 1)
 	{
 		alert("You must have at least one reference frame!");
@@ -256,7 +258,7 @@ function cancel()
 		states.splice(keepFrames);
 		edits.splice(keepFrames);
 		ticks.splice(keepFrames);
-		if(parseFloat(document.getElementById("ref").value) > keepFrames - 1)
+		if(parseInt(document.getElementById("ref").value) > keepFrames - 1)
 		{
 			update(keepFrames);
 		}

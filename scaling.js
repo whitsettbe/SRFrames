@@ -3,7 +3,7 @@ handle scaling in the interface
 */
 
 var xFactor = 1;
-var tFactor = 1 / 300000000;
+var tFactor = 1;// / 300000000;
 
 //retrieve from the edit boxes, unscaling as we go
 function getEdit(mode)
@@ -28,12 +28,17 @@ function setEdit(mode, value)
 //convert to exponential notation, with tolerance filter
 function expNot(val)
 {
-	var pwr = parseInt(Math.log10(Math.abs(val)));
+	var pwr = Math.floor(Math.log10(Math.abs(val)));
 	val /= Math.pow(10, pwr);
 	val = TOL * Math.round(val / TOL);
-	var d = parseInt(Math.log10(Math.abs(val)));
-	pwr += d;
-	val /= Math.pow(10, d);
+	var d = Math.floor(Math.log10(Math.abs(val)));
+	while(Math.abs(d) > TOL)
+	{
+		pwr += d;
+		val /= Math.pow(10, d);
+		val = TOL * Math.round(val / TOL);
+		d = Math.floor(Math.log10(Math.abs(val)));
+	}
 	return val + "e" + pwr;
 }
 

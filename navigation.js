@@ -363,7 +363,7 @@ function checkSpecial()
 	if(refUpdate == refUpdateSpecial) return; //don't update until user finishes entering number
 	//(@@ not sure I trust this check against false exits...)
 	refUpdateSpecial = refUpdate;
-	var val = parseFloat(document.getElementById("ref").value) - 1;
+	var val = parseInt(document.getElementById("ref").value) - 1;
 	var old = false;
 	for(var i = 0; i < special.length; i++)
 	{

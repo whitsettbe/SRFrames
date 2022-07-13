@@ -5,14 +5,14 @@ function update(newVal = "")
 	if(newVal != "")
 	{
 		document.getElementById("ref").value = newVal;
-		load();
+		//load();
 		redraw();
 		relist();
 		refUpdate += 1;
 	}
 	else
 	{
-		load();
+		//load();
 		redraw();
 		relist();
 	}
@@ -84,7 +84,7 @@ function numForm(num)
 //pull frame info from the form's frame index
 function load()
 {
-	var idx = parseFloat(document.getElementById("ref").value) - 1;
+	var idx = parseInt(document.getElementById("ref").value) - 1;
 	if(0 <= idx && idx < states.length && Math.abs(idx - Math.round(idx)) < TOL)
 	{
 		setEdit("x", states[idx][0]);
@@ -96,13 +96,6 @@ function load()
 	{
 		alert("Invalid reference frame index.");
 	}
-}
-
-//convert any type to float, rounding off insignificant bits
-function toFloat(num)
-{
-	//return TOL * Math.round(parseFloat(num) / TOL);
-	return parseFloat(num);
 }
 
 /*
