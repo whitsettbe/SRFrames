@@ -25,21 +25,21 @@ relist / load functionality
 //update the bounding coordinates of the canvas window
 function updateCoord()
 {
-	if(toFloat(document.getElementById("xmin").value) < toFloat(document.getElementById("xmax").value) &&
-			toFloat(document.getElementById("tmin").value) < toFloat(document.getElementById("tmax").value) &&
-			toFloat(document.getElementById("xstep").value) > 0 &&
-			toFloat(document.getElementById("tstep").value) > 0)
+	if(parseFloat(document.getElementById("xmin").value) < parseFloat(document.getElementById("xmax").value) &&
+			parseFloat(document.getElementById("tmin").value) < parseFloat(document.getElementById("tmax").value) &&
+			parseFloat(document.getElementById("xstep").value) > 0 &&
+			parseFloat(document.getElementById("tstep").value) > 0)
 	{
-		xMin = toFloat(document.getElementById("xmin").value);
-		xMax = toFloat(document.getElementById("xmax").value);
-		tMin = toFloat(document.getElementById("tmin").value);
-		tMax = toFloat(document.getElementById("tmax").value);
-		document.getElementById("xstep").value = Math.pow(10, Math.round(Math.log(
-				scaleIn("x", xMax - xMin) / 2) / Math.log(10)) - 1);
-		document.getElementById("tstep").value = Math.pow(10, Math.round(Math.log(
-				scaleIn("t", tMax - tMin) / 2) / Math.log(10)) - 1);
-		xStep = toFloat(document.getElementById("xstep").value);
-		tStep = toFloat(document.getElementById("tstep").value);
+		xMin = parseFloat(document.getElementById("xmin").value);
+		xMax = parseFloat(document.getElementById("xmax").value);
+		tMin = parseFloat(document.getElementById("tmin").value);
+		tMax = parseFloat(document.getElementById("tmax").value);
+		document.getElementById("xstep").value = expNot(Math.pow(10, Math.round(Math.log(
+				scaleIn("x", xMax - xMin) / 2) / Math.log(10)) - 1));
+		document.getElementById("tstep").value = expNot(Math.pow(10, Math.round(Math.log(
+				scaleIn("t", tMax - tMin) / 2) / Math.log(10)) - 1));
+		xStep = parseFloat(document.getElementById("xstep").value);
+		tStep = parseFloat(document.getElementById("tstep").value);
 		//update();
 	}
 	else
@@ -77,14 +77,14 @@ function relist()
 //format number for printing
 function numForm(num)
 {
-	var out = toFloat(num).toFixed(numDec);
+	var out = parseFloat(num).toFixed(numDec);
 	return ((out.startsWith("-") ? "" : " ") + out).substr(0, 3 + numDec);
 }
 
 //pull frame info from the form's frame index
 function load()
 {
-	var idx = toFloat(document.getElementById("ref").value) - 1;
+	var idx = parseFloat(document.getElementById("ref").value) - 1;
 	if(0 <= idx && idx < states.length && Math.abs(idx - Math.round(idx)) < TOL)
 	{
 		setEdit("x", states[idx][0]);
@@ -101,7 +101,8 @@ function load()
 //convert any type to float, rounding off insignificant bits
 function toFloat(num)
 {
-	return TOL * Math.round(Number.parseFloat(num) / TOL);
+	//return TOL * Math.round(parseFloat(num) / TOL);
+	return parseFloat(num);
 }
 
 /*

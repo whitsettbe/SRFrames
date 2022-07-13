@@ -130,7 +130,7 @@ function save()
 	else
 	{
 		//@@pan/zoom resets these values to the selected frame
-		var idx = toFloat(document.getElementById("ref").value) - 1;
+		var idx = parseFloat(document.getElementById("ref").value) - 1;
 		var x = getEdit("x");
 		var t = getEdit("t");
 		var v = getEdit("v");
@@ -179,7 +179,7 @@ function saveNew()
 		states.push([getEdit("x"), getEdit("t"), getEdit("v")]);
 		edits.push([getEdit("x"), getEdit("t"), getEdit("v")]);
 		ticks.push(getEdit("ax"));
-		update(toFloat(states.length));
+		update(parseFloat(states.length));
 
 		cancel();
 	}
@@ -188,7 +188,7 @@ function saveNew()
 //delete a reference frame
 function remove()
 {
-	var idx = toFloat(document.getElementById("ref").value) - 1;
+	var idx = parseFloat(document.getElementById("ref").value) - 1;
 	if(states.length == 1)
 	{
 		alert("You must have at least one reference frame!");
@@ -220,9 +220,9 @@ var lockIds = "btnImport btnExport exportLink btnTransform btnRemove btnIntersec
 //function to solve linear equations
 function linSolve(x0, y0, m0, x1, y1, m1)
 {
-	var ma = toFloat(-m0), mb = toFloat(-m1);
-	var a = toFloat(y0 - m0 * x0), b = toFloat(y1 - m1 * x1);
-	return [toFloat((a - b) / (ma - mb)), toFloat((b * ma - a * mb) / (ma - mb))];
+	var ma = parseFloat(-m0), mb = parseFloat(-m1);
+	var a = parseFloat(y0 - m0 * x0), b = parseFloat(y1 - m1 * x1);
+	return [parseFloat((a - b) / (ma - mb)), parseFloat((b * ma - a * mb) / (ma - mb))];
 }
 
 //lock all but the used button
@@ -256,7 +256,7 @@ function cancel()
 		states.splice(keepFrames);
 		edits.splice(keepFrames);
 		ticks.splice(keepFrames);
-		if(toFloat(document.getElementById("ref").value) > keepFrames - 1)
+		if(parseFloat(document.getElementById("ref").value) > keepFrames - 1)
 		{
 			update(keepFrames);
 		}

@@ -2,8 +2,8 @@
 handle scaling in the interface
 */
 
-var xFactor = 173;
-var tFactor = 1;
+var xFactor = 1;
+var tFactor = 1 / 300000000;
 
 //retrieve from the edit boxes, unscaling as we go
 function getEdit(mode)
@@ -19,8 +19,22 @@ function setEdit(mode, value)
 {
 	if(mode === "ax")
 		document.getElementById("ax").checked = value;
+	else if(Math.abs(value) > TOL)
+		document.getElementById(mode + "edit").value = expNot(scaleIn(mode, value));
 	else
-		document.getElementById(mode + "edit").value = scaleIn(mode, value);
+		document.getElementById(mode +"edit").value = "0e0";
+}
+
+//convert to exponential notation, with tolerance filter
+function expNot(val)
+{
+	var pwr = parseInt(Math.log10(Math.abs(val)));
+	val /= Math.pow(10, pwr);
+	val = TOL * Math.round(val / TOL);
+	var d = parseInt(Math.log10(Math.abs(val)));
+	pwr += d;
+	val /= Math.pow(10, d);
+	return val + "e" + pwr;
 }
 
 //apply scale factors
@@ -29,11 +43,11 @@ function scaleIn(mode, value)
 	switch(mode)
 	{
 		case "x":
-			return toFloat(value * xFactor);
+			return parseFloat(value * xFactor);
 		case "t":
-			return toFloat(value * tFactor);
+			return parseFloat(value * tFactor);
 		case "v":
-			return toFloat(value * xFactor / tFactor);
+			return parseFloat(value * xFactor / tFactor);
 	}
 }
 
@@ -43,10 +57,10 @@ function scaleOut(mode, value)
 	switch(mode)
 	{
 		case "x":
-			return toFloat(value) / xFactor;
+			return parseFloat(value) / xFactor;
 		case "t":
-			return toFloat(value) / tFactor;
+			return parseFloat(value) / tFactor;
 		case "v":
-			return toFloat(value) * tFactor / xFactor;
+			return parseFloat(value) * tFactor / xFactor;
 	}
 }

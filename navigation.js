@@ -232,13 +232,13 @@ function refchangeFn()
 {
 	if(this.value.length < 1) this.value = 1;
 	if(this.value.indexOf(".") >= 0) this.value = this.value.split(".")[0];
-	if(toFloat(this.value) - states.length > TOL) this.value = states.length;
-	if(toFloat(this.value) < 1) this.value = 1;
+	if(parseFloat(this.value) - states.length > TOL) this.value = states.length;
+	if(parseFloat(this.value) < 1) this.value = 1;
 	
 	if(lockout) this.value = oldRefVal;
 	else
 	{
-		oldRefVal = toFloat(this.value);
+		oldRefVal = parseFloat(this.value);
 		update();
 		refUpdate += 1;
 		if(special.length < specialCap) checkSpecial();
@@ -330,10 +330,10 @@ function pan(event)
 	var dy = tUnscale(y) - tUnscale(oldMouseY);
 
 	//apply coordinate shift
-	document.getElementById("xmin").value = -dx + toFloat(document.getElementById("xmin").value);
-	document.getElementById("xmax").value = -dx + toFloat(document.getElementById("xmax").value);
-	document.getElementById("tmin").value = -dy + toFloat(document.getElementById("tmin").value);
-	document.getElementById("tmax").value = -dy + toFloat(document.getElementById("tmax").value);
+	document.getElementById("xmin").value = -dx + parseFloat(document.getElementById("xmin").value);
+	document.getElementById("xmax").value = -dx + parseFloat(document.getElementById("xmax").value);
+	document.getElementById("tmin").value = -dy + parseFloat(document.getElementById("tmin").value);
+	document.getElementById("tmax").value = -dy + parseFloat(document.getElementById("tmax").value);
 	update();
 	canv.style.cursor = "move";
 }
@@ -363,7 +363,7 @@ function checkSpecial()
 	if(refUpdate == refUpdateSpecial) return; //don't update until user finishes entering number
 	//(@@ not sure I trust this check against false exits...)
 	refUpdateSpecial = refUpdate;
-	var val = toFloat(document.getElementById("ref").value) - 1;
+	var val = parseFloat(document.getElementById("ref").value) - 1;
 	var old = false;
 	for(var i = 0; i < special.length; i++)
 	{
