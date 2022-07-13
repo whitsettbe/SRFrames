@@ -1,6 +1,7 @@
 //collect all update functions in a single call
 function update(newVal = "")
 {
+	updateCoord();
 	if(newVal != "")
 	{
 		document.getElementById("ref").value = newVal;
@@ -21,15 +22,54 @@ function update(newVal = "")
 relist / load functionality
 */
 
+//update the bounding coordinates of the canvas window
+function updateCoord()
+{
+	if(toFloat(document.getElementById("xmin").value) < toFloat(document.getElementById("xmax").value) &&
+			toFloat(document.getElementById("tmin").value) < toFloat(document.getElementById("tmax").value) &&
+			toFloat(document.getElementById("xstep").value) > 0 &&
+			toFloat(document.getElementById("tstep").value) > 0)
+	{
+		xMin = toFloat(document.getElementById("xmin").value);
+		xMax = toFloat(document.getElementById("xmax").value);
+		tMin = toFloat(document.getElementById("tmin").value);
+		tMax = toFloat(document.getElementById("tmax").value);
+		document.getElementById("xstep").value = Math.pow(10, Math.round(Math.log(
+				scaleIn("x", xMax - xMin) / 2) / Math.log(10)) - 1);
+		document.getElementById("tstep").value = Math.pow(10, Math.round(Math.log(
+				scaleIn("t", tMax - tMin) / 2) / Math.log(10)) - 1);
+		xStep = toFloat(document.getElementById("xstep").value);
+		tStep = toFloat(document.getElementById("tstep").value);
+		//update();
+	}
+	else
+	{
+		alert("Invalid coordinate values");
+	}
+}
+
+
 //re-list numbers in the reference frame list
 function relist()
 {
-	var out = "<pre>  #  +  x"+" ".repeat(numDec + 1)+"  t"+" ".repeat(numDec + 1)+"  v/c<br>";
+	//catch not enough decimals
+	for(var i = 0; i < states.length; i++)
+	{
+		if(parseInt(Math.log10(Math.abs(scaleIn("x", states[i][0])))) > numDec)
+			numDec = parseInt(Math.log10(Math.abs(scaleIn("x", states[i][0]))));
+		if(parseInt(Math.log10(Math.abs(scaleIn("t", states[i][1])))) > numDec)
+			numDec = parseInt(Math.log10(Math.abs(scaleIn("t", states[i][1]))));
+		if(parseInt(Math.log10(Math.abs(scaleIn("v", states[i][2])))) > numDec)
+			numDec = parseInt(Math.log10(Math.abs(scaleIn("v", states[i][2]))));
+	}
+
+	var out = "<pre>  #  +  x"+" ".repeat(numDec + 1)+"  t"+" ".repeat(numDec + 1)+"  v<br>";
 	for(var i = 0; i < states.length; i++)
 	{
 		out += (Math.abs(states[i][0]) < TOL && Math.abs(states[i][1]) < TOL &&
-		    	Math.abs(states[i][2]) < TOL ? "> " : "  ") + (i + 1) + "  " + (ticks[i] ? "#" : "-") + " " +
-		    	numForm(states[i][0]) + " " + numForm(states[i][1]) + " " + numForm(states[i][2]) + "<br>";
+		    	Math.abs(states[i][2]) < TOL ? "> " : "  ") + (i + 1) + "  " +
+				(ticks[i] ? "#" : "-") + " " + numForm(scaleIn("x", states[i][0])) + " " +
+				numForm(scaleIn("t", states[i][1])) + " " + numForm(scaleIn("v", states[i][2])) + "<br>";
 	}
 	document.getElementById("states").innerHTML = out + "</pre>";
 }
@@ -148,7 +188,7 @@ function drawX(state, tick = true)
 	//tick marks
 	if(tick)
 	{
-		var step = xStep / Math.sqrt(1 - state[2] * state[2]);
+		var step = scaleOut("x", xStep) / Math.sqrt(1 - state[2] * state[2]);
 		for(var i = step * Math.ceil((xMin - state[0]) / step) + state[0], j = (xMax - i) / (xMax - xMin);
 				i <= xMax; i += step, j = (xMax - i) / (xMax - xMin))
 		{
@@ -171,7 +211,7 @@ function drawT(state, tick = true)
 	//tick marks
 	if(tick)
 	{
-		var step = tStep / Math.sqrt(1 - state[2] * state[2]);
+		var step = scaleOut("t", tStep) / Math.sqrt(1 - state[2] * state[2]);
 		for(var i = step * Math.ceil((tMin - state[1]) / step) + state[1], j = (tMax - i) / (tMax - tMin);
 				i <= tMax; i += step, j = (tMax - i) / (tMax - tMin))
 		{

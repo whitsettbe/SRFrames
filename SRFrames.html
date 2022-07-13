@@ -41,7 +41,7 @@
 	<div id="edits" style="display: none;">
 		X: <input type="text" id="xedit" value="0" pattern="-?[0-9]+(\.[0-9]*)?" required><br>T: <input
 				type="text" id="tedit" value="0" pattern="-?[0-9]+(\.[0-9]*)?" required><br>V: <input
-				type="text" id="vedit" value="0" pattern="-?0(\.[0-9]*)?" required><br>
+				type="text" id="vedit" value="0" pattern="-?[0-9]+(\.[0-9]*)?" required><br>
 		Show ticks? <input type="checkbox" id="ax" checked="true"><br>
 	</div>
 	<hr>
@@ -51,7 +51,8 @@
 			type="button" value="Calculate" onclick="calcV()"> V: <input
 			type="text" id="vcalc" value="0" pattern="[.0-9]*" readonly><br>
 	<hr>
-	Tick scale: <input type="text" id="xstep" value="1" pattern="[.0-9e]+" readonly><br>
+	X ticks: <input type="text" id="xstep" value="1" pattern="[.0-9e]+" readonly><br>
+	T ticks: <input type="text" id="tstep" value="1" pattern="[.0-9]+" readonly><br>
 	<hr>
 	Precision: <input type="button" value="-" onclick="decimals(-1)"><input
 			type="button" value="+" onclick="decimals(1)"><br>
@@ -74,6 +75,7 @@
 <hr>
 <textarea id="notes">Notes...7:31am</textarea>
 <script src="main.js"></script>
+<script src="scaling.js"></script>
 <script src="screen.js"></script>
 <script src="navigation.js"></script>
 <script src="tools.js"></script>

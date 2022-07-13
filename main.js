@@ -70,7 +70,6 @@ function animate(oldStates, basis, oldBBox, f)
 			toFloat(oldBBox[2] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2));
 	document.getElementById("tmax").value =
 			toFloat(oldBBox[3] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2));
-	updateCoord();
 	update();
 	if(f < FRAMES) setTimeout(function(){animate(oldStates, basis, oldBBox, f + 1);}, FRAME_GAP);
 	else
@@ -249,7 +248,7 @@ function fromText(text)
 	document.getElementById("tmax").value = toFloat(keys.pop());
 	document.getElementById("xstep").value = toFloat(keys.pop());
 	document.getElementById("tstep").value = toFloat(keys.pop());
-	updateCoord();
+	update();
 	var numFrame = Math.round(toFloat(keys.pop()));
 	states = []; edits = []; ticks = [];
 
@@ -285,43 +284,4 @@ function calcV()
 	var mn = Math.min(document.getElementById("d1").value, document.getElementById("d2").value);
 	var mx = Math.max(document.getElementById("d1").value, document.getElementById("d2").value);
 	document.getElementById("vcalc").value = Math.sqrt(1 - (mn * mn) / (mx * mx));
-}
-
-/*
-handle scaling in the interface
-*/
-
-var xFactor = 1;
-var tFactor = 1;
-
-//retrieve from the edit boxes, unscaling as we go
-function getEdit(mode)
-{
-	switch(mode)
-	{
-		case "x":
-			return toFloat(document.getElementById("xedit").value) / xFactor;
-		case "t":
-			return toFloat(document.getElementById("tedit").value) / tFactor;
-		case "v":
-			return toFloat(document.getElementById("vedit").value) * tFactor / xFactor;
-		case "ax":
-			return document.getElementById("ax").checked;
-	}
-}
-
-//set the edit boxes, scaling as we go
-function setEdit(mode, value)
-{
-	switch(mode)
-	{
-		case "x":
-			document.getElementById("xedit").value = toFloat(value * xFactor);
-		case "t":
-			document.getElementById("tedit").value = toFloat(value * tFactor);
-		case "v":
-			document.getElementById("vedit").value = toFloat(value * xFactor / tFactor);
-		case "ax":
-			document.getElementById("ax").checked = value;
-	}
 }

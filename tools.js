@@ -171,7 +171,7 @@ function saveNew()
 	}
 	else
 	{
-		if(Math.abs(toFloat(document.getElementById("vedit").value)) >= 1)
+		if(Math.abs(getEdit("v")) >= 1)
 		{
 			alert("Superluminal speeds not allowed");
 			return;

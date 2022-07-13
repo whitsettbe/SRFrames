@@ -250,28 +250,6 @@ function refchangeFn()
 mechanics
 */
 
-//update the bounding coordinates of the canvas window
-function updateCoord()
-{
-	if(toFloat(document.getElementById("xmin").value) < toFloat(document.getElementById("xmax").value) &&
-			toFloat(document.getElementById("tmin").value) < toFloat(document.getElementById("tmax").value) &&
-			toFloat(document.getElementById("xstep").value) > 0 &&
-			toFloat(document.getElementById("tstep").value) > 0)
-	{
-		xMin = toFloat(document.getElementById("xmin").value);
-		xMax = toFloat(document.getElementById("xmax").value);
-		tMin = toFloat(document.getElementById("tmin").value);
-		tMax = toFloat(document.getElementById("tmax").value);
-		xStep = toFloat(document.getElementById("xstep").value);
-		tStep = toFloat(document.getElementById("tstep").value);
-		update();
-	}
-	else
-	{
-		alert("Invalid coordinate values");
-	}
-}
-
 //distance from a point (two coords) to a line (two coords per defining point)
 function ptLineDist(x0, y0, x1, y1, x2, y2)
 {
@@ -356,7 +334,7 @@ function pan(event)
 	document.getElementById("xmax").value = -dx + toFloat(document.getElementById("xmax").value);
 	document.getElementById("tmin").value = -dy + toFloat(document.getElementById("tmin").value);
 	document.getElementById("tmax").value = -dy + toFloat(document.getElementById("tmax").value);
-	updateCoord();
+	update();
 	canv.style.cursor = "move";
 }
 
@@ -372,14 +350,11 @@ function zoom(event, pwr)
 	document.getElementById("xmax").value = x + Math.pow(ZOOM_FACTOR, pwr) * (xMax - x);
 	document.getElementById("tmin").value = y + Math.pow(ZOOM_FACTOR, pwr) * (tMin - y);
 	document.getElementById("tmax").value = y + Math.pow(ZOOM_FACTOR, pwr) * (tMax - y);
-	updateCoord();
+	update();
 	canv.style.cursor = (pwr > 0 ? "zoom-out" : "zoom-in");
 
 	//tweak tickmark scale
-	document.getElementById("xstep").value = Math.pow(10, Math.round(Math.log((xMax - xMin) / 2)
-			/ Math.log(10)) - 1);
-	document.getElementById("tstep").value = toFloat(document.getElementById("xstep").value);
-	updateCoord();
+	update();
 }
 
 //check the selected frame for special-ness and store if needed
