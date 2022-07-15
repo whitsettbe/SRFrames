@@ -34,20 +34,26 @@ function mousemoveFn(event)
 	var y = event.pageY - canvRect.top;
 	canv.style.cursor = "default";
 
-	//highlights
-	if(!lockout && event.buttons & LEFT > 0)
-		showClose(event);
-
 	//drag panning
-	if(event.buttons & LEFT > 0)
+	if(event.buttons & LEFT > 0 && oldMouseX >= 0 && oldMouseY >= 0)
 	{
+		//highlights
+		if(!lockout) showClose(event);
+
+		//panning
 		pan(event);
 		memTimeout = (new Date()).getTime();
-	}
 
-	//update most recent location
-	oldMouseX = x;
-	oldMouseY = y;
+		//update location
+		oldMouseX = x;
+		oldMouseY = y;
+	}
+	else
+	{
+		//reset location
+		oldMouseX = -1;
+		oldMouseY = -1;
+	}
 }
 
 //on mouse down: (mouse move behavior)
@@ -167,7 +173,7 @@ function pointermoveFn(event)
 	}
 	ptrX /= pointCache.length;
 	ptrY /= pointCache.length;
-	pan({pageX: ptrX, pageY: ptrY});
+	pan({pageX: ptrX, pageY: ptrY});//@@this should be glitchy on mobile now
 
 	//update highlights and finish saving coordinates
 	if(pointCache.length == 1 && !lockout)
@@ -202,24 +208,32 @@ function pointerupFn(event)
 	prevPtrGap = 0;
 
 	//update center of pointers
-	oldMouseX = 0;
-	oldMouseY = 0;
-	for(var i = 0; i < pointCache.length; i++)
-	{
-		oldMouseX += pointCache[i].pageX;
-		oldMouseY += pointCache[i].pageY;
-	}
-	oldMouseX /= pointCache.length;
-	oldMouseY /= pointCache.length;
 
 	//update highlights and finish saving coordinates
 	if(pointCache.length > 0 && !lockout)
 	{
+		//update center of pointers
+		oldMouseX = 0;
+		oldMouseY = 0;
+		for(var i = 0; i < pointCache.length; i++)
+		{
+			oldMouseX += pointCache[i].pageX;
+			oldMouseY += pointCache[i].pageY;
+		}
+		oldMouseX /= pointCache.length;
+		oldMouseY /= pointCache.length;
+
+		//highlights
 		showClose({pageX: oldMouseX, pageY: oldMouseY});
 		memTimeout = (new Date()).getTime();
+		oldMouseX -= canvRect.left;
+		oldMouseY -= canvRect.top;
 	}
-	oldMouseX -= canvRect.left;
-	oldMouseY -= canvRect.top;
+	else
+	{
+		oldMouseX = -1;
+		oldMouseY = -1;
+	}
 }
 
 /*

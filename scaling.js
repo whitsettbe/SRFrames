@@ -22,7 +22,7 @@ function setEdit(mode, value)
 	else if(Math.abs(value) > TOL)
 		document.getElementById(mode + "edit").value = expRound(scaleIn(mode, value));
 	else
-		document.getElementById(mode +"edit").value = "0e+0";
+		document.getElementById(mode +"edit").value = "0e0";
 }
 
 //convert to exponential notation, with tolerance filter
