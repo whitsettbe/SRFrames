@@ -54,6 +54,9 @@
 	X ticks: <input type="text" id="xstep" value="1" pattern="[.0-9e]+" readonly><br>
 	T ticks: <input type="text" id="tstep" value="1" pattern="[.0-9]+" readonly><br>
 	<hr>
+	X unit: <select id="xUnit"></select><br>
+	T unit: <select id="tUnit"></select><br>
+	<hr>
 	Precision: <input type="button" value="-" onclick="decimals(-1)"><input
 			type="button" value="+" onclick="decimals(1)"><br>
 
@@ -75,11 +78,12 @@
 <hr>
 <textarea id="notes">Notes...9:55am</textarea>
 <script src="main.js"></script>
-<script src="scaling.js"></script>
+<script src="units.js"></script>
 <script src="screen.js"></script>
 <script src="navigation.js"></script>
 <script src="tools.js"></script>
 <script>
+	unitLoad();
 	update();
 </script>
 </body>
