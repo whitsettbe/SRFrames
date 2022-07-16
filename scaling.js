@@ -69,3 +69,42 @@ function scaleOut(mode, value)
 			return parseFloat(value) * tFactor / xFactor;
 	}
 }
+
+/*
+collect units
+*/
+
+var units = [];
+var splitUnits = [[], []];
+function unitLoad()
+{
+	var fr=new FileReader();
+	fr.onload=function()
+	{
+		packs = fr.result.split("\n");
+
+		//read distance units
+		var block = 0;
+		packs.forEach(function(pack)
+		{
+			if(pack.indexOf("=") == -1 && pack.length > 0)
+			{
+				units[pack] = 1;
+				splitUnits[0].push(pack);
+			}
+			else if(pack.length > 0)
+			{
+				if(pack.indexOf("*") != -1)
+					units[pack.substring(0, pack.indexOf(" = "))] =
+							units[pack.substring(pack.indexOf(" = ") + 3, pack.indexOf(" * "))] *
+							parseFloat(pack.substring(pack.indexOf(" * ") + 3));
+				else
+					units[pack.substring(0, pack.indexOf(" = "))] =
+							units[pack.substring(pack.indexOf(" = ") + 3, pack.indexOf(" / "))] /
+							parseFloat(pack.substring(pack.indexOf(" / ") + 3));
+				splitUnits[block].push(pack.substring(0, pack.indexOf(" = ")));//@@
+			}
+		});
+	}
+	fr.readAsText("units");
+}

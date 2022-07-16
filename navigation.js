@@ -173,7 +173,10 @@ function pointermoveFn(event)
 	}
 	ptrX /= pointCache.length;
 	ptrY /= pointCache.length;
-	pan({pageX: ptrX, pageY: ptrY});//@@this should be glitchy on mobile now
+
+	//double-check the oldMouse position is valid
+	if(oldMouseX >= 0 && oldMouseY >= 0)
+		pan({pageX: ptrX, pageY: ptrY});
 
 	//update highlights and finish saving coordinates
 	if(pointCache.length == 1 && !lockout)
