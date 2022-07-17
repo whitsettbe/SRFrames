@@ -130,7 +130,6 @@ function save()
 	}
 	else
 	{
-		//@@pan/zoom resets these values to the selected frame
 		var idx = parseInt(document.getElementById("ref").value) - 1;
 		var x = getEdit("x");
 		var t = getEdit("t");

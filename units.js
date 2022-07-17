@@ -29,7 +29,7 @@ handle scaling in the interface
 */
 
 var xFactor = 1;
-var tFactor = 1;// / 300000000;
+var tFactor = 1;
 
 //retrieve from the edit boxes, unscaling as we go
 function getEdit(mode)

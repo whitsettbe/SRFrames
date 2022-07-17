@@ -64,14 +64,10 @@ function animate(oldStates, basis, oldBBox, f)
 		states[i] = trans(oldStates[i],
 				[basis[0] * f / FRAMES, basis[1] * f / FRAMES, basis[2] * f / FRAMES]);
 	}
-	xMin = //document.getElementById("xmin").value =
-			parseFloat(oldBBox[0] - (oldBBox[0] + oldBBox[1]) / 2 * Math.pow(f / FRAMES, 2));
-	xMax = //document.getElementById("xmax").value =
-			parseFloat(oldBBox[1] - (oldBBox[0] + oldBBox[1]) / 2 * Math.pow(f / FRAMES, 2));
-	tMin = //document.getElementById("tmin").value =
-			parseFloat(oldBBox[2] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2));
-	tMax = //document.getElementById("tmax").value =
-			parseFloat(oldBBox[3] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2));
+	xMin = oldBBox[0] - (oldBBox[0] + oldBBox[1]) / 2 * Math.pow(f / FRAMES, 2);
+	xMax = oldBBox[1] - (oldBBox[0] + oldBBox[1]) / 2 * Math.pow(f / FRAMES, 2);
+	tMin = oldBBox[2] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2);
+	tMax = oldBBox[3] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2);
 	update();
 	if(f < FRAMES) setTimeout(function(){animate(oldStates, basis, oldBBox, f + 1);}, FRAME_GAP);
 	else
@@ -185,17 +181,11 @@ setInterval(function()
 document.getElementById("btnUndo").addEventListener("click", undo, false);
 function undo()
 {
-	//memTimeout = (new Date()).getTime();
-	if(specialCap == 0 && memCap > 1)// && toText() === mem[memCap - 1])
+	if(specialCap == 0 && memCap > 1)
 	{
-		//mem.pop();
 		memCap--;
 		fromText(mem[memCap - 1]);
 	}
-	/*else if(memCap > 0)
-	{
-		fromText(mem[memCap - 1]);
-	}*/
 }
 
 //how to redo
@@ -209,16 +199,17 @@ function redo()
 	}
 }
 
-//process undo / redo / cancel / save / import key input
+//process keybindings
 document.body.addEventListener('keydown', function(e)
 {
-	//update document history
+	//undo
 	if(e.key.toLowerCase() == "z" && e.ctrlKey && !e.shiftKey)
 	{
 		e.preventDefault();
 		if(!document.getElementById("btnUndo").disabled)
 			undo();
 	}
+	//redo
 	else if(e.key.toLowerCase() == "y" && e.ctrlKey && !e.shiftKey
 			|| e.key.toLowerCase() == "z" && e.ctrlKey && e.shiftKey)
 	{
@@ -226,26 +217,30 @@ document.body.addEventListener('keydown', function(e)
 		if(!document.getElementById("btnRedo").disabled)
 			redo();
 	}
-
 	//call cancel
 	else if(e.key.toLowerCase() == "escape")
 	{
 		e.preventDefault();
 		cancel();
 	}
-
 	//save file
 	else if(e.ctrlKey && e.key.toLowerCase() == "s")
 	{
 		e.preventDefault();
 		fileSave();
 	}
-
 	//import file
 	else if(e.ctrlKey && e.key.toLowerCase() == "o")
 	{
 		e.preventDefault();
 		document.getElementById("import").click();
+	}
+	//delete reference frame
+	else if((e.key.toLowerCase() == "backspace" || e.key.toLowerCase() == "delete")
+			&& document.activeElement.tagName.toLowerCase() != "input")
+	{
+		e.preventDefault();
+		remove();
 	}
 }, false);
 
@@ -269,10 +264,10 @@ function toText()
 function fromText(text)
 {
 	var keys = text.substr(text.lastIndexOf("@\n") + 2).split(/\s+/).reverse();
-	xMin /*document.getElementById("xmin").value*/ = parseFloat(keys.pop());
-	xMax /*document.getElementById("xmax").value*/ = parseFloat(keys.pop());
-	tMin /*document.getElementById("tmin").value*/ = parseFloat(keys.pop());
-	tMax /*document.getElementById("tmax").value*/ = parseFloat(keys.pop());
+	xMin = parseFloat(keys.pop());
+	xMax = parseFloat(keys.pop());
+	tMin = parseFloat(keys.pop());
+	tMax = parseFloat(keys.pop());
 	approxUnits(1 / parseFloat(keys.pop()), 1 / parseFloat(keys.pop()));
 	update();
 	var numFrame = Math.round(parseFloat(keys.pop()));

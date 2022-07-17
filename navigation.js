@@ -18,7 +18,6 @@ var prevPtrGap = 0;
 var refUpdate = 0, refUpdateSpecial = 0;
 var oldRefVal = 1;
 
-
 /*
 mouse controls
 */
@@ -210,8 +209,6 @@ function pointerupFn(event)
 	//reset pointer gap ALWAYS
 	prevPtrGap = 0;
 
-	//update center of pointers
-
 	//update highlights and finish saving coordinates
 	if(pointCache.length > 0 && !lockout)
 	{
@@ -347,10 +344,10 @@ function pan(event)
 	var dy = tUnscale(y) - tUnscale(oldMouseY);
 
 	//apply coordinate shift
-	xMin /*document.getElementById("xmin").value*/ = -dx + xMin;
-	xMax /*document.getElementById("xmax").value*/ = -dx + xMax;
-	tMin /*document.getElementById("tmin").value*/ = -dy + tMin;
-	tMax /*document.getElementById("tmax").value*/ = -dy + tMax;
+	xMin -= dx;
+	xMax -= dx;
+	tMin -= dy;
+	tMax -= dy;
 	update();
 	canv.style.cursor = "move";
 }
@@ -363,10 +360,10 @@ function zoom(event, pwr)
 	var y = tUnscale(event.pageY - canvRect.top);
 
 	//adjust boundaries accordingly
-	xMin /*document.getElementById("xmin").value*/ = x + Math.pow(ZOOM_FACTOR, pwr) * (xMin - x);
-	xMax /*document.getElementById("xmax").value*/ = x + Math.pow(ZOOM_FACTOR, pwr) * (xMax - x);
-	tMin /*document.getElementById("tmin").value*/ = y + Math.pow(ZOOM_FACTOR, pwr) * (tMin - y);
-	tMax /*document.getElementById("tmax").value*/ = y + Math.pow(ZOOM_FACTOR, pwr) * (tMax - y);
+	xMin = x + Math.pow(ZOOM_FACTOR, pwr) * (xMin - x);
+	xMax = x + Math.pow(ZOOM_FACTOR, pwr) * (xMax - x);
+	tMin = y + Math.pow(ZOOM_FACTOR, pwr) * (tMin - y);
+	tMax = y + Math.pow(ZOOM_FACTOR, pwr) * (tMax - y);
 	update();
 	canv.style.cursor = (pwr > 0 ? "zoom-out" : "zoom-in");
 

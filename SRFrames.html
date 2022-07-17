@@ -19,26 +19,25 @@
 </table>
 <div id="temp" style="display: none;">
 <form id="form">
+	<input type="button" value="Import" id="btnImport">
+	<input type="file" id="import" value="" style="display: none;">
+	<input type="button" value="Export" id="btnExport" onclick="fileSave()">
+	<a download="refframe.txt.rf" id="exportLink" style="display: none"></a>
 	<input type="button" value="Undo" id="btnUndo">
 	<input type="button" value="Redo" id="btnRedo">
-	<hr>
-	<input type="button" value="Import from file" id="btnImport">
-	<input type="file" id="import" value="" style="display: none;">
-	<input type="button" value="Export to file" id="btnExport" onclick="fileSave()">
-	<a download="refframe.txt.rf" id="exportLink" style="display: none"></a><br>
 	<hr>
 	RF#: <input type="number" id="ref" value="1"> <input
 			type="button" value="Pick Frame" onclick="transform()" id="btnTransform"> <input
 			type="button" value="Remove" onclick="remove()" id="btnRemove"><br>
 	<hr>
-	<input type="button" value="Cancel operation" onclick="cancel();"><br>
+	<input type="button" value="Cancel" onclick="cancel();">
 	<input type="button" id="btnIntersect" value="Intersect" onclick="intersect()">
-	<input type="button" id="btnPointTo" value="Point towards" onclick="pointTowards()"><br>
-	<hr>
+	<input type="button" id="btnPointTo" value="Point towards" onclick="pointTowards()">
 	<input type="button" id="btnSave" value="Save" onclick="save()"> <input
 			type="button" id="btnSaveNew" value="Save New" onclick="saveNew()"><br>
-	<hr>
+	
 	<div id="edits" style="display: none;">
+		<br>
 		X: <input type="text" id="xedit" value="0" pattern="-?(([0-9]+\.?[0-9]*)|(\.[0-9]+))(e(-|\+)?[0-9]+)?" required><br>T: <input
 				type="text" id="tedit" value="0" pattern="-?(([0-9]+\.?[0-9]*)|(\.[0-9]+))(e(-|\+)?[0-9]+)?" required><br>V: <input
 				type="text" id="vedit" value="0" pattern="-?(([0-9]+\.?[0-9]*)|(\.[0-9]+))(e(-|\+)?[0-9]+)?" required><br>
@@ -51,11 +50,8 @@
 			type="button" value="Calculate" onclick="calcV()"> V: <input
 			type="text" id="vcalc" value="0" pattern="[.0-9]*" readonly><br>
 	<hr>
-	X ticks: <input type="text" id="xstep" value="1" pattern="[.0-9e]+" readonly><br>
-	T ticks: <input type="text" id="tstep" value="1" pattern="[.0-9]+" readonly><br>
-	<hr>
-	X unit: <select id="xUnit"></select><br>
-	T unit: <select id="tUnit"></select><br>
+	X scale: <input type="text" id="xstep" value="1" pattern="[.0-9e]+" readonly><select id="xUnit"></select><br>
+	T ticks: <input type="text" id="tstep" value="1" pattern="[.0-9]+" readonly><select id="tUnit"></select><br>
 	<hr>
 	Precision: <input type="button" value="-" onclick="decimals(-1)"><input
 			type="button" value="+" onclick="decimals(1)"><br>

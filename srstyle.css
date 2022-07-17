@@ -17,6 +17,7 @@ input:invalid
 select
 {
 	width: 160px;
+    padding: 1px 2px;
 }
 
 hr

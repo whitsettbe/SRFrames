@@ -22,47 +22,20 @@ function update(newVal = "")
 relist / load functionality
 */
 
-//update the bounding coordinates of the canvas window
+//update the tickmarks
 function updateCoord()
 {
-	/*if(parseFloat(document.getElementById("xmin").value) < parseFloat(document.getElementById("xmax").value) &&
-			parseFloat(document.getElementById("tmin").value) < parseFloat(document.getElementById("tmax").value) &&
-			parseFloat(document.getElementById("xstep").value) > 0 &&
-			parseFloat(document.getElementById("tstep").value) > 0)*/
-	{
-		/*xMin = parseFloat(document.getElementById("xmin").value);
-		xMax = parseFloat(document.getElementById("xmax").value);
-		tMin = parseFloat(document.getElementById("tmin").value);
-		tMax = parseFloat(document.getElementById("tmax").value);*/
-		document.getElementById("xstep").value = expRound(Math.pow(10, Math.round(Math.log(
-				scaleIn("x", xMax - xMin) / 2) / Math.log(10)) - 1));
-		document.getElementById("tstep").value = expRound(Math.pow(10, Math.round(Math.log(
-				scaleIn("t", tMax - tMin) / 2) / Math.log(10)) - 1));
-		xStep = parseFloat(document.getElementById("xstep").value);
-		tStep = parseFloat(document.getElementById("tstep").value);
-		//update();
-	}
-	/*else
-	{
-		alert("Invalid coordinate values");
-	}*/
+	document.getElementById("xstep").value = expRound(Math.pow(10, Math.round(Math.log(
+			scaleIn("x", xMax - xMin) / 2) / Math.log(10)) - 1));
+	document.getElementById("tstep").value = expRound(Math.pow(10, Math.round(Math.log(
+			scaleIn("t", tMax - tMin) / 2) / Math.log(10)) - 1));
+	xStep = parseFloat(document.getElementById("xstep").value);
+	tStep = parseFloat(document.getElementById("tstep").value);
 }
-
 
 //re-list numbers in the reference frame list
 function relist()
 {
-	/*//catch not enough decimals
-	for(var i = 0; i < states.length; i++)
-	{
-		if(parseInt(Math.log10(Math.abs(scaleIn("x", states[i][0])))) > numDec)
-			numDec = parseInt(Math.log10(Math.abs(scaleIn("x", states[i][0]))));
-		if(parseInt(Math.log10(Math.abs(scaleIn("t", states[i][1])))) > numDec)
-			numDec = parseInt(Math.log10(Math.abs(scaleIn("t", states[i][1]))));
-		if(parseInt(Math.log10(Math.abs(scaleIn("v", states[i][2])))) > numDec)
-			numDec = parseInt(Math.log10(Math.abs(scaleIn("v", states[i][2]))));
-	}*/
-
 	var out = "<pre>  #  +  x"+" ".repeat(numDec + 5)+"  t"+" ".repeat(numDec + 5)+"  v<br>";
 	for(var i = 0; i < states.length; i++)
 	{
@@ -95,26 +68,6 @@ function numForm(mode, num)
 	}
 
 	return (front + "e" + exp + "  ").substring(0, 7 + numDec);
-/*	//@@filled with errors...
-	//move scaleIn call here so we can check <TOL 0 case
-	//use expRound, capture the decimal value from the result
-	//toFixed adjusts the decimal, then reconcat
-	//check in case of rollover to adjust exponent
-	var out = expRound(parseFloat(num));
-	if(out.indexOf(".") == -1) out += ".";
-	out += "0".repeat(numDec);
-	var carry = (out[out.indexOf(".")+numDec+1] > "4");
-	out = out.substring(0, out.indexOf(".")+numDec+1);
-	var d = numDec;
-	while(carry > 0)
-	{
-		var newCarry = parseInt((carry + parseInt(out[out.indexOf(".")+d])) / 10);
-		out = out.substring(0, out.indexOf(".") + d) +
-				((carry + parseInt(out[out.indexOf(".")+d])) % 10) +
-				out.substring(out.indexOf(".") + d + 1);
-		d--;
-	}
-	return ((out.startsWith("-") ? "" : " ") + out + " ").substring(0, 7 + numDec);*/
 }
 
 //pull frame info from the form's frame index
