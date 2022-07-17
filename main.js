@@ -234,6 +234,7 @@ function toText()
 {
 	var text = document.getElementById("notes").value + "@\n";
 	text += xMin + " " + xMax + " " + tMin + " " + tMax + " " + xStep + " " + tStep + "\n";
+	text += xFactor + " " + tFactor + "\n";
 	text += states.length + "\n";
 	for(var i = 0; i < states.length; i++)
 		text += (ticks[i] ? 1 : 0) + " " + parseFloat(states[i][0]) + " " + parseFloat(states[i][1]) + " " +
@@ -249,8 +250,9 @@ function fromText(text)
 	document.getElementById("xmax").value = parseFloat(keys.pop());
 	document.getElementById("tmin").value = parseFloat(keys.pop());
 	document.getElementById("tmax").value = parseFloat(keys.pop());
-	document.getElementById("xstep").value = parseFloat(keys.pop());
-	document.getElementById("tstep").value = parseFloat(keys.pop());
+	keys.pop();//document.getElementById("xstep").value = parseFloat(keys.pop());
+	keys.pop();//document.getElementById("tstep").value = parseFloat(keys.pop());
+	approxUnits(1 / parseFloat(keys.pop()), 1 / parseFloat(keys.pop()));
 	update();
 	var numFrame = Math.round(parseFloat(keys.pop()));
 	states = []; edits = []; ticks = [];

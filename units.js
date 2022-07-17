@@ -100,11 +100,11 @@ function scaleOut(mode, value)
 collect units
 */
 
+var units = [];
+var splitUnits = [[], []];
+
 function unitLoad()
 {
-    var units = [];
-    var splitUnits = [[], []];
-
     packs = unitString.split("\n");
 
     //read distance units
@@ -156,3 +156,26 @@ function unitLoad()
 //define update functions
 document.getElementById("xUnit").addEventListener("change", function(){xFactor = 1 / this.value; update()});
 document.getElementById("tUnit").addEventListener("change", function(){tFactor = 1 / this.value; update()});
+
+//load approximate units from file
+function approxUnits(xFact, tFact)
+{
+    bestX = "";
+    bestT = "";
+    for(var i = 0; i < splitUnits.length; i++)
+    {
+        splitUnits[i].forEach(function(unit)
+        {
+            if(bestX == "" || Math.abs(Math.log(units[unit] / xFact)) <
+                    Math.abs(Math.log(units[bestX] / xFact)))
+                bestX = unit;
+            if(bestT == "" || Math.abs(Math.log(units[unit] / tFact)) <
+                    Math.abs(Math.log(units[bestT] / tFact)))
+                bestT = unit;
+        });
+    }
+    document.getElementById("xUnit").value = units[bestX];
+    document.getElementById("tUnit").value = units[bestT];
+    xFactor = 1 / units[bestX];
+    tFactor = 1 / units[bestT];
+}
