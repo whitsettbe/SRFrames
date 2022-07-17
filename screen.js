@@ -5,21 +5,19 @@ function update(newVal = "")
 	if(newVal != "")
 	{
 		document.getElementById("ref").value = newVal;
-		//load();
 		redraw();
 		relist();
 		refUpdate += 1;
 	}
 	else
 	{
-		//load();
 		redraw();
 		relist();
 	}
 }
 
 /*
-relist / load functionality
+relist functionality
 */
 
 //update the tickmarks
@@ -68,23 +66,6 @@ function numForm(mode, num)
 	}
 
 	return (front + "e" + exp + "  ").substring(0, 7 + numDec);
-}
-
-//pull frame info from the form's frame index
-function load()
-{
-	var idx = parseInt(document.getElementById("ref").value) - 1;
-	if(0 <= idx && idx < states.length && Math.abs(idx - Math.round(idx)) < TOL)
-	{
-		setEdit("x", states[idx][0]);
-		setEdit("t", states[idx][1]);
-		setEdit("v", states[idx][2]);
-		setEdit("ax", ticks[idx]);
-	}
-	else
-	{
-		alert("Invalid reference frame index.");
-	}
 }
 
 /*

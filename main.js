@@ -93,8 +93,7 @@ function transform()
 {
 	memTimeout = (new Date()).getTime();
 	update();
-	load();
-	basis = [getEdit("x"), getEdit("t"), getEdit("v")];
+	basis = [...states[parseInt(document.getElementById("ref").value) - 1]];
 	if(Math.abs(basis[2]) >= 1)
 	{
 		alert("Superluminal speeds not allowed");
@@ -292,7 +291,6 @@ function fromText(text)
 	document.getElementById("notes").value = text.substr(0, text.lastIndexOf('@'));
 	document.getElementById("import").value = "";
 	update(refNum);
-	cancel();
 }
 
 /*

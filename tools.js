@@ -241,6 +241,24 @@ function doLockout(toKeep, stopMice = false)
 	if(stopMice) lockout = true;
 }
 
+//pull frame info from the form's frame index
+function load()
+{
+	var idx = parseInt(document.getElementById("ref").value) - 1;
+	if(0 <= idx && idx < states.length && Math.abs(idx - Math.round(idx)) < TOL)
+	{
+		setEdit("x", states[idx][0]);
+		setEdit("t", states[idx][1]);
+		setEdit("v", states[idx][2]);
+		setEdit("ax", ticks[idx]);
+	}
+	else
+	{
+		alert("Invalid reference frame index.");
+	}
+}
+
+
 //unlock buttons and stop procedures
 function cancel()
 {
