@@ -148,6 +148,11 @@ function unitLoad()
 
     //store dropdown menus
     document.getElementById("xUnit").innerHTML = xUnitHTML;
+    xFactor = 1 / document.getElementById("xUnit").value;
     document.getElementById("tUnit").innerHTML = tUnitHTML;
-
+    tFactor = 1 / document.getElementById("tUnit").value;
 }
+
+//define update functions
+document.getElementById("xUnit").addEventListener("change", function(){xFactor = 1 / this.value; update()});
+document.getElementById("tUnit").addEventListener("change", function(){tFactor = 1 / this.value; update()});

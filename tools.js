@@ -217,7 +217,8 @@ function remove()
 helper fns
 */
 
-var lockIds = "btnImport btnExport exportLink btnTransform btnRemove btnIntersect btnPointTo btnSave btnSaveNew";
+var lockIds = "btnImport btnExport exportLink btnTransform btnRemove btnIntersect btnPointTo btnSave btnSaveNew"
+		+ " xUnit tUnit";
 
 //function to solve linear equations
 function linSolve(x0, y0, m0, x1, y1, m1)
@@ -250,7 +251,8 @@ function cancel()
 	for(var i = 0; i < locks.length; i++)
 	{
 		document.getElementById(locks[i]).disabled = false;
-		document.getElementById(locks[i]).style.borderStyle = "outset";
+		if(document.getElementById(locks[i]).type == "button")
+			document.getElementById(locks[i]).style.borderStyle = "outset";
 	}
 	lockout = false;
 	if(keepFrames != -1)
