@@ -360,14 +360,35 @@ function zoom(event, pwr)
 	var y = tUnscale(event.pageY - canvRect.top);
 
 	//adjust boundaries accordingly
-	xMin = x + Math.pow(ZOOM_FACTOR, pwr) * (xMin - x);
-	xMax = x + Math.pow(ZOOM_FACTOR, pwr) * (xMax - x);
-	tMin = y + Math.pow(ZOOM_FACTOR, pwr) * (tMin - y);
-	tMax = y + Math.pow(ZOOM_FACTOR, pwr) * (tMax - y);
+	if(document.getElementById("zoomX").checked)
+	{
+		xMin = x + Math.pow(ZOOM_FACTOR, pwr) * (xMin - x);
+		xMax = x + Math.pow(ZOOM_FACTOR, pwr) * (xMax - x);
+	}
+	if(document.getElementById("zoomT").checked)
+	{
+		tMin = y + Math.pow(ZOOM_FACTOR, pwr) * (tMin - y);
+		tMax = y + Math.pow(ZOOM_FACTOR, pwr) * (tMax - y);
+	}
 	update();
 	canv.style.cursor = (pwr > 0 ? "zoom-out" : "zoom-in");
 
 	//tweak tickmark scale
+	update();
+}
+
+//restore square bounding box on center
+function square()
+{
+	var x = (xMax + xMin) / 2;
+	var y = (tMax + tMin) / 2;
+	var d = ((xMax - xMin) / 2 + (tMax - tMin) / 2) / 2;
+	xMax = x + d;
+	xMin = x - d;
+	tMax = y + d;
+	tMin = y - d;
+	document.getElementById("zoomX").checked = true;
+	document.getElementById("zoomT").checked = true;
 	update();
 }
 

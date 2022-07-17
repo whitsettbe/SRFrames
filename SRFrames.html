@@ -26,22 +26,18 @@
 	<input type="button" value="Undo" id="btnUndo">
 	<input type="button" value="Redo" id="btnRedo">
 	<hr>
-	RF#: <input type="number" id="ref" value="1"> <input
-			type="button" value="Pick Frame" onclick="transform()" id="btnTransform"> <input
-			type="button" value="Remove" onclick="remove()" id="btnRemove"><br>
-	<hr>
 	<input type="button" value="Cancel" onclick="cancel();">
 	<input type="button" id="btnIntersect" value="Intersect" onclick="intersect()">
-	<input type="button" id="btnPointTo" value="Point towards" onclick="pointTowards()">
-	<input type="button" id="btnSave" value="Save" onclick="save()"> <input
-			type="button" id="btnSaveNew" value="Save New" onclick="saveNew()"><br>
+	<input type="button" id="btnPointTo" value="Aim" onclick="pointTowards()">
+	<input type="button" id="btnSave" value="Edit" onclick="save()"> <input
+			type="button" id="btnSaveNew" value="New" onclick="saveNew()"><br>
 	
 	<div id="edits" style="display: none;">
 		<br>
 		X: <input type="text" id="xedit" value="0" pattern="-?(([0-9]+\.?[0-9]*)|(\.[0-9]+))(e(-|\+)?[0-9]+)?" required><br>T: <input
 				type="text" id="tedit" value="0" pattern="-?(([0-9]+\.?[0-9]*)|(\.[0-9]+))(e(-|\+)?[0-9]+)?" required><br>V: <input
 				type="text" id="vedit" value="0" pattern="-?(([0-9]+\.?[0-9]*)|(\.[0-9]+))(e(-|\+)?[0-9]+)?" required><br>
-		Show ticks? <input type="checkbox" id="ax" checked="true"><br>
+		Show ticks?<input type="checkbox" id="ax" checked="true"><br>
 	</div>
 	<hr>
 	Calculate velocity between two measurements:<br>
@@ -52,6 +48,13 @@
 	<hr>
 	X scale: <input type="text" id="xstep" value="1" pattern="[.0-9e]+" readonly><select id="xUnit"></select><br>
 	T ticks: <input type="text" id="tstep" value="1" pattern="[.0-9]+" readonly><select id="tUnit"></select><br>
+	X zoom?<input type="checkbox" id="zoomX" checked="true">
+	T zoom?<input type="checkbox" id="zoomT" checked="true">
+	<input type="button" id="btnSquare" value="Restore 1:1" onclick="square()">
+	<hr>
+	RF#: <input type="number" id="ref" value="1"> <input
+			type="button" value="Pick Frame" onclick="transform()" id="btnTransform"> <input
+			type="button" value="Remove" onclick="remove()" id="btnRemove"><br>
 	<hr>
 	Precision: <input type="button" value="-" onclick="decimals(-1)"><input
 			type="button" value="+" onclick="decimals(1)"><br>
@@ -59,7 +62,7 @@
 <p id="states"></p>
 </div>
 <hr>
-<textarea id="notes">Notes...9:55am</textarea>
+<textarea id="notes">Notes...</textarea>
 <script src="main.js"></script>
 <script src="units.js"></script>
 <script src="screen.js"></script>

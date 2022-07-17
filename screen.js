@@ -188,6 +188,7 @@ function drawT(state, tick = true)
 //draw tick mark given location (in pixels) and slope
 function drawTick(x, t, slp)
 {
+	slp *= (tMax - tMin) / (xMax - xMin);
 	ctx.beginPath();
 	ctx.moveTo(x - COORD_RAD / Math.sqrt(1 + slp * slp), t - COORD_RAD * slp / Math.sqrt(1 + slp * slp));
 	ctx.lineTo(x + COORD_RAD / Math.sqrt(1 + slp * slp), t + COORD_RAD * slp / Math.sqrt(1 + slp * slp));
