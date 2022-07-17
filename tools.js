@@ -124,16 +124,16 @@ function save()
 	doLockout("btnSave", true);
 	if(getComputedStyle(btnSave).borderStyle === "outset")
 	{
+		load();
 		document.getElementById("edits").style.display = "inline";
 		btnSave.style.borderStyle = "inset";
 	}
 	else
 	{
-		//@@pan/zoom resets these values to the selected frame
-		var idx = toFloat(document.getElementById("ref").value) - 1;
-		var x = toFloat(document.getElementById("xedit").value);
-		var t = toFloat(document.getElementById("tedit").value);
-		var v = toFloat(document.getElementById("vedit").value);
+		var idx = parseInt(document.getElementById("ref").value) - 1;
+		var x = getEdit("x");
+		var t = getEdit("t");
+		var v = getEdit("v");
 		if(idx < 0 || states.length <= idx || Math.abs(idx - Math.round(idx)) > TOL)
 		{
 			alert("Invalid reference frame index.");
@@ -152,7 +152,7 @@ function save()
 			states[idx][0] = x; edits[idx][0] = x;
 			states[idx][1] = t; edits[idx][1] = t;
 			states[idx][2] = v; edits[idx][2] = v;
-			ticks[idx] = document.getElementById("ax").checked;
+			ticks[idx] = getEdit("ax");
 			update();
 		}
 		cancel();
@@ -166,24 +166,21 @@ function saveNew()
 	doLockout("btnSaveNew", true);
 	if(getComputedStyle(btnSaveNew).borderStyle === "outset")
 	{
+		load();
 		document.getElementById("edits").style.display = "inline";
 		btnSaveNew.style.borderStyle = "inset";
 	}
 	else
 	{
-		if(Math.abs(toFloat(document.getElementById("vedit").value)) >= 1)
+		if(Math.abs(getEdit("v")) >= 1)
 		{
 			alert("Superluminal speeds not allowed");
 			return;
 		}
-		states.push([toFloat(document.getElementById("xedit").value),
-				toFloat(document.getElementById("tedit").value),
-				toFloat(document.getElementById("vedit").value)]);
-		edits.push([toFloat(document.getElementById("xedit").value),
-				toFloat(document.getElementById("tedit").value),
-				toFloat(document.getElementById("vedit").value)]);
-		ticks.push(document.getElementById("ax").checked);
-		update(toFloat(states.length));
+		states.push([getEdit("x"), getEdit("t"), getEdit("v")]);
+		edits.push([getEdit("x"), getEdit("t"), getEdit("v")]);
+		ticks.push(getEdit("ax"));
+		update(parseFloat(states.length));
 
 		cancel();
 	}
@@ -192,7 +189,7 @@ function saveNew()
 //delete a reference frame
 function remove()
 {
-	var idx = toFloat(document.getElementById("ref").value) - 1;
+	var idx = parseInt(document.getElementById("ref").value) - 1;
 	if(states.length == 1)
 	{
 		alert("You must have at least one reference frame!");
@@ -219,14 +216,15 @@ function remove()
 helper fns
 */
 
-var lockIds = "btnImport btnExport exportLink btnTransform btnRemove btnIntersect btnPointTo btnSave btnSaveNew";
+var lockIds = "btnImport btnExport exportLink btnTransform btnRemove btnIntersect btnPointTo btnSave btnSaveNew"
+		+ " btnUndo btnRedo xUnit tUnit";
 
 //function to solve linear equations
 function linSolve(x0, y0, m0, x1, y1, m1)
 {
-	var ma = toFloat(-m0), mb = toFloat(-m1);
-	var a = toFloat(y0 - m0 * x0), b = toFloat(y1 - m1 * x1);
-	return [toFloat((a - b) / (ma - mb)), toFloat((b * ma - a * mb) / (ma - mb))];
+	var ma = parseFloat(-m0), mb = parseFloat(-m1);
+	var a = parseFloat(y0 - m0 * x0), b = parseFloat(y1 - m1 * x1);
+	return [parseFloat((a - b) / (ma - mb)), parseFloat((b * ma - a * mb) / (ma - mb))];
 }
 
 //lock all but the used button
@@ -243,6 +241,24 @@ function doLockout(toKeep, stopMice = false)
 	if(stopMice) lockout = true;
 }
 
+//pull frame info from the form's frame index
+function load()
+{
+	var idx = parseInt(document.getElementById("ref").value) - 1;
+	if(0 <= idx && idx < states.length && Math.abs(idx - Math.round(idx)) < TOL)
+	{
+		setEdit("x", states[idx][0]);
+		setEdit("t", states[idx][1]);
+		setEdit("v", states[idx][2]);
+		setEdit("ax", ticks[idx]);
+	}
+	else
+	{
+		alert("Invalid reference frame index.");
+	}
+}
+
+
 //unlock buttons and stop procedures
 function cancel()
 {
@@ -252,7 +268,8 @@ function cancel()
 	for(var i = 0; i < locks.length; i++)
 	{
 		document.getElementById(locks[i]).disabled = false;
-		document.getElementById(locks[i]).style.borderStyle = "outset";
+		if(document.getElementById(locks[i]).type == "button")
+			document.getElementById(locks[i]).style.borderStyle = "outset";
 	}
 	lockout = false;
 	if(keepFrames != -1)
@@ -260,7 +277,7 @@ function cancel()
 		states.splice(keepFrames);
 		edits.splice(keepFrames);
 		ticks.splice(keepFrames);
-		if(toFloat(document.getElementById("ref").value) > keepFrames - 1)
+		if(parseInt(document.getElementById("ref").value) > keepFrames - 1)
 		{
 			update(keepFrames);
 		}

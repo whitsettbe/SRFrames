@@ -18,7 +18,6 @@ var prevPtrGap = 0;
 var refUpdate = 0, refUpdateSpecial = 0;
 var oldRefVal = 1;
 
-
 /*
 mouse controls
 */
@@ -34,20 +33,26 @@ function mousemoveFn(event)
 	var y = event.pageY - canvRect.top;
 	canv.style.cursor = "default";
 
-	//highlights
-	if(!lockout && event.buttons & LEFT > 0)
-		showClose(event);
-
 	//drag panning
-	if(event.buttons & LEFT > 0)
+	if(event.buttons & LEFT > 0 && oldMouseX >= 0 && oldMouseY >= 0)
 	{
-		pan(event);
-		memHold = (new Date()).getTime();
-	}
+		//highlights
+		if(!lockout) showClose(event);
 
-	//update most recent location
-	oldMouseX = x;
-	oldMouseY = y;
+		//panning
+		pan(event);
+		memTimeout = (new Date()).getTime();
+
+		//update location
+		oldMouseX = x;
+		oldMouseY = y;
+	}
+	else
+	{
+		//reset location
+		oldMouseX = -1;
+		oldMouseY = -1;
+	}
 }
 
 //on mouse down: (mouse move behavior)
@@ -77,7 +82,7 @@ function wheelFn(event)
 
 	//if scroll up (-) zoom in, else zoom out
 	zoom(event, event.deltaY < 0 ? -1 : 1);
-	memHold = (new Date()).getTime();
+	memTimeout = (new Date()).getTime();
 
 	//don't actually scroll
 	event.preventDefault();
@@ -119,7 +124,7 @@ function pointerdownFn(event)
 	if(!lockout)
 	{
 		showClose({pageX: oldMouseX, pageY: oldMouseY});
-		memHold = (new Date()).getTime();
+		memTimeout = (new Date()).getTime();
 	}
 	oldMouseX -= canvRect.left;
 	oldMouseY -= canvRect.top;
@@ -155,7 +160,7 @@ function pointermoveFn(event)
 				Math.log(prevPtrGap / ptrGap) / Math.log(ZOOM_FACTOR));
 		prevPtrGap = ptrGap;
 
-		memHold = (new Date()).getTime();
+		memTimeout = (new Date()).getTime();
 	}
 
 	//create pannable mouse move event
@@ -167,13 +172,16 @@ function pointermoveFn(event)
 	}
 	ptrX /= pointCache.length;
 	ptrY /= pointCache.length;
-	pan({pageX: ptrX, pageY: ptrY});
+
+	//double-check the oldMouse position is valid
+	if(oldMouseX >= 0 && oldMouseY >= 0)
+		pan({pageX: ptrX, pageY: ptrY});
 
 	//update highlights and finish saving coordinates
 	if(pointCache.length == 1 && !lockout)
 	{
 		showClose({pageX: ptrX, pageY: ptrY});
-		memHold = (new Date()).getTime();
+		memTimeout = (new Date()).getTime();
 	}
 	oldMouseX = ptrX - canvRect.left;
 	oldMouseY = ptrY - canvRect.top;
@@ -201,25 +209,31 @@ function pointerupFn(event)
 	//reset pointer gap ALWAYS
 	prevPtrGap = 0;
 
-	//update center of pointers
-	oldMouseX = 0;
-	oldMouseY = 0;
-	for(var i = 0; i < pointCache.length; i++)
-	{
-		oldMouseX += pointCache[i].pageX;
-		oldMouseY += pointCache[i].pageY;
-	}
-	oldMouseX /= pointCache.length;
-	oldMouseY /= pointCache.length;
-
 	//update highlights and finish saving coordinates
 	if(pointCache.length > 0 && !lockout)
 	{
+		//update center of pointers
+		oldMouseX = 0;
+		oldMouseY = 0;
+		for(var i = 0; i < pointCache.length; i++)
+		{
+			oldMouseX += pointCache[i].pageX;
+			oldMouseY += pointCache[i].pageY;
+		}
+		oldMouseX /= pointCache.length;
+		oldMouseY /= pointCache.length;
+
+		//highlights
 		showClose({pageX: oldMouseX, pageY: oldMouseY});
-		memHold = (new Date()).getTime();
+		memTimeout = (new Date()).getTime();
+		oldMouseX -= canvRect.left;
+		oldMouseY -= canvRect.top;
 	}
-	oldMouseX -= canvRect.left;
-	oldMouseY -= canvRect.top;
+	else
+	{
+		oldMouseX = -1;
+		oldMouseY = -1;
+	}
 }
 
 /*
@@ -232,45 +246,23 @@ function refchangeFn()
 {
 	if(this.value.length < 1) this.value = 1;
 	if(this.value.indexOf(".") >= 0) this.value = this.value.split(".")[0];
-	if(toFloat(this.value) - states.length > TOL) this.value = states.length;
-	if(toFloat(this.value) < 1) this.value = 1;
+	if(parseFloat(this.value) - states.length > TOL) this.value = states.length;
+	if(parseFloat(this.value) < 1) this.value = 1;
 	
 	if(lockout) this.value = oldRefVal;
 	else
 	{
-		oldRefVal = toFloat(this.value);
+		oldRefVal = parseFloat(this.value);
 		update();
 		refUpdate += 1;
 		if(special.length < specialCap) checkSpecial();
 	}
-	memHold = (new Date()).getTime();
+	memTimeout = (new Date()).getTime();
 }
 
 /*
 mechanics
 */
-
-//update the bounding coordinates of the canvas window
-function updateCoord()
-{
-	if(toFloat(document.getElementById("xmin").value) < toFloat(document.getElementById("xmax").value) &&
-			toFloat(document.getElementById("tmin").value) < toFloat(document.getElementById("tmax").value) &&
-			toFloat(document.getElementById("xstep").value) > 0 &&
-			toFloat(document.getElementById("tstep").value) > 0)
-	{
-		xMin = toFloat(document.getElementById("xmin").value);
-		xMax = toFloat(document.getElementById("xmax").value);
-		tMin = toFloat(document.getElementById("tmin").value);
-		tMax = toFloat(document.getElementById("tmax").value);
-		xStep = toFloat(document.getElementById("xstep").value);
-		tStep = toFloat(document.getElementById("tstep").value);
-		update();
-	}
-	else
-	{
-		alert("Invalid coordinate values");
-	}
-}
 
 //distance from a point (two coords) to a line (two coords per defining point)
 function ptLineDist(x0, y0, x1, y1, x2, y2)
@@ -352,11 +344,11 @@ function pan(event)
 	var dy = tUnscale(y) - tUnscale(oldMouseY);
 
 	//apply coordinate shift
-	document.getElementById("xmin").value = -dx + toFloat(document.getElementById("xmin").value);
-	document.getElementById("xmax").value = -dx + toFloat(document.getElementById("xmax").value);
-	document.getElementById("tmin").value = -dy + toFloat(document.getElementById("tmin").value);
-	document.getElementById("tmax").value = -dy + toFloat(document.getElementById("tmax").value);
-	updateCoord();
+	xMin -= dx;
+	xMax -= dx;
+	tMin -= dy;
+	tMax -= dy;
+	update();
 	canv.style.cursor = "move";
 }
 
@@ -368,18 +360,15 @@ function zoom(event, pwr)
 	var y = tUnscale(event.pageY - canvRect.top);
 
 	//adjust boundaries accordingly
-	document.getElementById("xmin").value = x + Math.pow(ZOOM_FACTOR, pwr) * (xMin - x);
-	document.getElementById("xmax").value = x + Math.pow(ZOOM_FACTOR, pwr) * (xMax - x);
-	document.getElementById("tmin").value = y + Math.pow(ZOOM_FACTOR, pwr) * (tMin - y);
-	document.getElementById("tmax").value = y + Math.pow(ZOOM_FACTOR, pwr) * (tMax - y);
-	updateCoord();
+	xMin = x + Math.pow(ZOOM_FACTOR, pwr) * (xMin - x);
+	xMax = x + Math.pow(ZOOM_FACTOR, pwr) * (xMax - x);
+	tMin = y + Math.pow(ZOOM_FACTOR, pwr) * (tMin - y);
+	tMax = y + Math.pow(ZOOM_FACTOR, pwr) * (tMax - y);
+	update();
 	canv.style.cursor = (pwr > 0 ? "zoom-out" : "zoom-in");
 
 	//tweak tickmark scale
-	document.getElementById("xstep").value = Math.pow(10, Math.round(Math.log((xMax - xMin) / 2)
-			/ Math.log(10)) - 1);
-	document.getElementById("tstep").value = toFloat(document.getElementById("xstep").value);
-	updateCoord();
+	update();
 }
 
 //check the selected frame for special-ness and store if needed
@@ -388,7 +377,7 @@ function checkSpecial()
 	if(refUpdate == refUpdateSpecial) return; //don't update until user finishes entering number
 	//(@@ not sure I trust this check against false exits...)
 	refUpdateSpecial = refUpdate;
-	var val = toFloat(document.getElementById("ref").value) - 1;
+	var val = parseInt(document.getElementById("ref").value) - 1;
 	var old = false;
 	for(var i = 0; i < special.length; i++)
 	{

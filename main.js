@@ -1,3 +1,5 @@
+//@@toFloat needed in file retrieval?
+
 //defining constants
 var DIM = Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.9);
 var PT_RAD = 5;
@@ -8,11 +10,6 @@ var numDec = 4;
 var TOL = .000000000004;
 var FRAMES = 20;
 var FRAME_GAP = 50;
-
-//undo/redo space
-var mem = [];
-var memTimeout = 0;
-var MEM_GAP = 1000;
 
 //canvas setup
 var canv = document.getElementById("myCanvas");
@@ -59,14 +56,20 @@ var special = [];
 var specialCap = 0;
 
 //animate a coordinate transition
-function animate(oldStates, basis, f)
+function animate(oldStates, basis, oldBBox, f)
 {
+	memTimeout = (new Date()).getTime();
 	for(var i = 0; i < oldStates.length; i++)
 	{
-		states[i] = trans(oldStates[i], [basis[0] * f / FRAMES, basis[1] * f / FRAMES, basis[2] * f / FRAMES]);
+		states[i] = trans(oldStates[i],
+				[basis[0] * f / FRAMES, basis[1] * f / FRAMES, basis[2] * f / FRAMES]);
 	}
+	xMin = oldBBox[0] - (oldBBox[0] + oldBBox[1]) / 2 * Math.pow(f / FRAMES, 2);
+	xMax = oldBBox[1] - (oldBBox[0] + oldBBox[1]) / 2 * Math.pow(f / FRAMES, 2);
+	tMin = oldBBox[2] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2);
+	tMax = oldBBox[3] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2);
 	update();
-	if(f < FRAMES) setTimeout(function(){animate(oldStates, basis, f + 1);}, FRAME_GAP);
+	if(f < FRAMES) setTimeout(function(){animate(oldStates, basis, oldBBox, f + 1);}, FRAME_GAP);
 	else
 	{
 		update();
@@ -88,10 +91,9 @@ function decimals(change)
 //choose the current editor space as a new reference frame basis and translate everything
 function transform()
 {
+	memTimeout = (new Date()).getTime();
 	update();
-	basis = [toFloat(document.getElementById("xedit").value),
-			toFloat(document.getElementById("tedit").value),
-			toFloat(document.getElementById("vedit").value)];
+	basis = [...states[parseInt(document.getElementById("ref").value) - 1]];
 	if(Math.abs(basis[2]) >= 1)
 	{
 		alert("Superluminal speeds not allowed");
@@ -102,7 +104,7 @@ function transform()
 	{
 		oldStates.push(states[i]);
 	}
-	animate(oldStates, basis, 1);
+	animate(oldStates, basis, [xMin, xMax, tMin, tMax], 1);
 }
 
 /*
@@ -155,32 +157,91 @@ function fileSave()
 handle undo / redo behaviors
 */
 
-//automatic state-saving each second
+//undo/redo space
+var mem = [];
+var memCap = 0;
+var memTimeout = 0;
+var MEM_GAP = 400;
+
+//automatic state-saving
 setInterval(function()
 {
 	text = toText();
 	if(specialCap == 0 && ((new Date()).getTime() - memTimeout > MEM_GAP) &&
-			(mem.length == 0 || text !== mem[mem.length - 1]))
+			(mem.length == 0 || text !== mem[memCap - 1]))
 	{
+		mem.splice(memCap);
 		mem.push(text);
+		memCap++;
 	}
-}, 1000);
+}, 200);
 
 //how to undo
 document.getElementById("btnUndo").addEventListener("click", undo, false);
 function undo()
 {
-	memTimeout = (new Date()).getTime();
-	if(mem.length > 1 && toText() === mem[mem.length - 1])
+	if(specialCap == 0 && memCap > 1)
 	{
-		mem.pop();
-		fromText(mem[mem.length - 1]);
-	}
-	else if(mem.length > 0)
-	{
-		fromText(mem[mem.length - 1]);
+		memCap--;
+		fromText(mem[memCap - 1]);
 	}
 }
+
+//how to redo
+document.getElementById("btnRedo").addEventListener("click", redo, false);
+function redo()
+{
+	if(specialCap == 0 && memCap < mem.length)
+	{
+		memCap++;
+		fromText(mem[memCap - 1]);
+	}
+}
+
+//process keybindings
+document.body.addEventListener('keydown', function(e)
+{
+	//undo
+	if(e.key.toLowerCase() == "z" && e.ctrlKey && !e.shiftKey)
+	{
+		e.preventDefault();
+		if(!document.getElementById("btnUndo").disabled)
+			undo();
+	}
+	//redo
+	else if(e.key.toLowerCase() == "y" && e.ctrlKey && !e.shiftKey
+			|| e.key.toLowerCase() == "z" && e.ctrlKey && e.shiftKey)
+	{
+		e.preventDefault();
+		if(!document.getElementById("btnRedo").disabled)
+			redo();
+	}
+	//call cancel
+	else if(e.key.toLowerCase() == "escape")
+	{
+		e.preventDefault();
+		cancel();
+	}
+	//save file
+	else if(e.ctrlKey && e.key.toLowerCase() == "s")
+	{
+		e.preventDefault();
+		fileSave();
+	}
+	//import file
+	else if(e.ctrlKey && e.key.toLowerCase() == "o")
+	{
+		e.preventDefault();
+		document.getElementById("import").click();
+	}
+	//delete reference frame
+	else if((e.key.toLowerCase() == "backspace" || e.key.toLowerCase() == "delete")
+			&& document.activeElement.tagName.toLowerCase() != "input")
+	{
+		e.preventDefault();
+		remove();
+	}
+}, false);
 
 /*
 convert program info to text
@@ -189,26 +250,27 @@ convert program info to text
 function toText()
 {
 	var text = document.getElementById("notes").value + "@\n";
-	text += xMin + " " + xMax + " " + tMin + " " + tMax + " " + xStep + " " + tStep + "\n";
-	text += states.length + "\n";
+	text += xMin + " " + xMax + " " + tMin + " " + tMax + "\n";
+	text += xFactor + " " + tFactor + "\n";
+	text += states.length + " " + document.getElementById("ref").value + "\n";
 	for(var i = 0; i < states.length; i++)
-		text += (ticks[i] ? 1 : 0) + " " + toFloat(states[i][0]) + " " + toFloat(states[i][1]) + " " +
-				toFloat(states[i][2]) + " " + toFloat(edits[i][0]) + " " + toFloat(edits[i][1]) + " " +
-				toFloat(edits[i][2]) + "\n";
+		text += (ticks[i] ? 1 : 0) + " " + parseFloat(states[i][0]) + " " + parseFloat(states[i][1]) + " " +
+				parseFloat(states[i][2]) + " " + parseFloat(edits[i][0]) + " " + parseFloat(edits[i][1]) + " " +
+				parseFloat(edits[i][2]) + "\n";
 	return text;
 }
 
 function fromText(text)
 {
 	var keys = text.substr(text.lastIndexOf("@\n") + 2).split(/\s+/).reverse();
-	document.getElementById("xmin").value = toFloat(keys.pop());
-	document.getElementById("xmax").value = toFloat(keys.pop());
-	document.getElementById("tmin").value = toFloat(keys.pop());
-	document.getElementById("tmax").value = toFloat(keys.pop());
-	document.getElementById("xstep").value = toFloat(keys.pop());
-	document.getElementById("tstep").value = toFloat(keys.pop());
-	updateCoord();
-	var numFrame = Math.round(toFloat(keys.pop()));
+	xMin = parseFloat(keys.pop());
+	xMax = parseFloat(keys.pop());
+	tMin = parseFloat(keys.pop());
+	tMax = parseFloat(keys.pop());
+	approxUnits(1 / parseFloat(keys.pop()), 1 / parseFloat(keys.pop()));
+	update();
+	var numFrame = Math.round(parseFloat(keys.pop()));
+	var refNum = parseInt(keys.pop());
 	states = []; edits = []; ticks = [];
 
 	//get reference frame lines
@@ -216,19 +278,19 @@ function fromText(text)
 	{
 		ticks.push(Number.parseInt(keys.pop()) == 1);
 		states.push([]);
-		states[i].push(toFloat(keys.pop()));
-		states[i].push(toFloat(keys.pop()));
-		states[i].push(toFloat(keys.pop()));
+		states[i].push(parseFloat(keys.pop()));
+		states[i].push(parseFloat(keys.pop()));
+		states[i].push(parseFloat(keys.pop()));
 		edits.push([]);
-		edits[i].push(toFloat(keys.pop()));
-		edits[i].push(toFloat(keys.pop()));
-		edits[i].push(toFloat(keys.pop()));
+		edits[i].push(parseFloat(keys.pop()));
+		edits[i].push(parseFloat(keys.pop()));
+		edits[i].push(parseFloat(keys.pop()));
 	}
 
 	//update notes and refresh
 	document.getElementById("notes").value = text.substr(0, text.lastIndexOf('@'));
 	document.getElementById("import").value = "";
-	update(1);//@@may want to switch to base frame instead of first frame
+	update(refNum);
 }
 
 /*

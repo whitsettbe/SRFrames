@@ -1,67 +1,71 @@
 //collect all update functions in a single call
 function update(newVal = "")
 {
+	updateCoord();
 	if(newVal != "")
 	{
 		document.getElementById("ref").value = newVal;
-		load();
 		redraw();
 		relist();
 		refUpdate += 1;
 	}
 	else
 	{
-		load();
 		redraw();
 		relist();
 	}
 }
 
 /*
-relist / load functionality
+relist functionality
 */
+
+//update the tickmarks
+function updateCoord()
+{
+	document.getElementById("xstep").value = expRound(Math.pow(10, Math.round(Math.log(
+			scaleIn("x", xMax - xMin) / 2) / Math.log(10)) - 1));
+	document.getElementById("tstep").value = expRound(Math.pow(10, Math.round(Math.log(
+			scaleIn("t", tMax - tMin) / 2) / Math.log(10)) - 1));
+	xStep = parseFloat(document.getElementById("xstep").value);
+	tStep = parseFloat(document.getElementById("tstep").value);
+}
 
 //re-list numbers in the reference frame list
 function relist()
 {
-	var out = "<pre>  #  +  x"+" ".repeat(numDec + 1)+"  t"+" ".repeat(numDec + 1)+"  v/c<br>";
+	var out = "<pre>  #  +  x"+" ".repeat(numDec + 5)+"  t"+" ".repeat(numDec + 5)+"  v<br>";
 	for(var i = 0; i < states.length; i++)
 	{
 		out += (Math.abs(states[i][0]) < TOL && Math.abs(states[i][1]) < TOL &&
-		    	Math.abs(states[i][2]) < TOL ? "> " : "  ") + (i + 1) + "  " + (ticks[i] ? "#" : "-") + " " +
-		    	numForm(states[i][0]) + " " + numForm(states[i][1]) + " " + numForm(states[i][2]) + "<br>";
+		    	Math.abs(states[i][2]) < TOL ? "> " : "  ") + (i + 1) + "  " +
+				(ticks[i] ? "#" : "-") + " " + numForm("x", states[i][0]) + " " +
+				numForm("t", states[i][1]) + " " + numForm("v", states[i][2]) + "<br>";
 	}
 	document.getElementById("states").innerHTML = out + "</pre>";
 }
 
 //format number for printing
-function numForm(num)
+function numForm(mode, num)
 {
-	var out = toFloat(num).toFixed(numDec);
-	return ((out.startsWith("-") ? "" : " ") + out).substr(0, 3 + numDec);
-}
-
-//pull frame info from the form's frame index
-function load()
-{
-	var idx = toFloat(document.getElementById("ref").value) - 1;
-	if(0 <= idx && idx < states.length && Math.abs(idx - Math.round(idx)) < TOL)
-	{
-		document.getElementById("xedit").value = toFloat(states[idx][0]);
-		document.getElementById("tedit").value = toFloat(states[idx][1]);
-		document.getElementById("vedit").value = toFloat(states[idx][2]);
-		document.getElementById("ax").checked = ticks[idx];
-	}
+	var out;
+	if(Math.abs(num) > TOL)
+		out = expRound(scaleIn(mode, num));
 	else
-	{
-		alert("Invalid reference frame index.");
-	}
-}
+		out = "0e0";
+	var front = parseFloat(out.substring(0, out.indexOf("e"))).toFixed(numDec);
+	front = (parseFloat(front) < 0 ? "" : " ") + front;
+	var exp = parseInt(out.substring(out.indexOf("e") + 1));
 
-//convert any type to float, rounding off insignificant bits
-function toFloat(num)
-{
-	return TOL * Math.round(Number.parseFloat(num) / TOL);
+	//catch rollover in toFixed
+	if(front.indexOf(".") > 2)
+	{
+		front = (parseFloat(front) / 10).toFixed(numDec);
+		front = (parseFloat(front) < 0 ? "" : " ") + front;
+		exp += 1;
+	}
+
+	return (front + "e" + exp + "  ").substring(0, 7 + numDec);
 }
 
 /*
@@ -91,7 +95,7 @@ function redraw()
 	}
 
 	//load alternate settings for highlighted frame
-	ctx.lineWidth = oldLineWidth * 2;
+	ctx.lineWidth = oldLineWidth * 1.5;
 	ctx.strokeStyle = "#FF0000";
 	draw(states[parseInt(document.getElementById("ref").value) - 1], true, true, true, false,
 			ticks[parseInt(document.getElementById("ref").value) - 1]);
@@ -148,7 +152,7 @@ function drawX(state, tick = true)
 	//tick marks
 	if(tick)
 	{
-		var step = xStep / Math.sqrt(1 - state[2] * state[2]);
+		var step = scaleOut("x", xStep) / Math.sqrt(1 - state[2] * state[2]);
 		for(var i = step * Math.ceil((xMin - state[0]) / step) + state[0], j = (xMax - i) / (xMax - xMin);
 				i <= xMax; i += step, j = (xMax - i) / (xMax - xMin))
 		{
@@ -171,7 +175,7 @@ function drawT(state, tick = true)
 	//tick marks
 	if(tick)
 	{
-		var step = tStep / Math.sqrt(1 - state[2] * state[2]);
+		var step = scaleOut("t", tStep) / Math.sqrt(1 - state[2] * state[2]);
 		for(var i = step * Math.ceil((tMin - state[1]) / step) + state[1], j = (tMax - i) / (tMax - tMin);
 				i <= tMax; i += step, j = (tMax - i) / (tMax - tMin))
 		{
