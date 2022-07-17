@@ -347,10 +347,10 @@ function pan(event)
 	var dy = tUnscale(y) - tUnscale(oldMouseY);
 
 	//apply coordinate shift
-	document.getElementById("xmin").value = -dx + parseFloat(document.getElementById("xmin").value);
-	document.getElementById("xmax").value = -dx + parseFloat(document.getElementById("xmax").value);
-	document.getElementById("tmin").value = -dy + parseFloat(document.getElementById("tmin").value);
-	document.getElementById("tmax").value = -dy + parseFloat(document.getElementById("tmax").value);
+	xMin /*document.getElementById("xmin").value*/ = -dx + xMin;
+	xMax /*document.getElementById("xmax").value*/ = -dx + xMax;
+	tMin /*document.getElementById("tmin").value*/ = -dy + tMin;
+	tMax /*document.getElementById("tmax").value*/ = -dy + tMax;
 	update();
 	canv.style.cursor = "move";
 }
@@ -363,10 +363,10 @@ function zoom(event, pwr)
 	var y = tUnscale(event.pageY - canvRect.top);
 
 	//adjust boundaries accordingly
-	document.getElementById("xmin").value = x + Math.pow(ZOOM_FACTOR, pwr) * (xMin - x);
-	document.getElementById("xmax").value = x + Math.pow(ZOOM_FACTOR, pwr) * (xMax - x);
-	document.getElementById("tmin").value = y + Math.pow(ZOOM_FACTOR, pwr) * (tMin - y);
-	document.getElementById("tmax").value = y + Math.pow(ZOOM_FACTOR, pwr) * (tMax - y);
+	xMin /*document.getElementById("xmin").value*/ = x + Math.pow(ZOOM_FACTOR, pwr) * (xMin - x);
+	xMax /*document.getElementById("xmax").value*/ = x + Math.pow(ZOOM_FACTOR, pwr) * (xMax - x);
+	tMin /*document.getElementById("tmin").value*/ = y + Math.pow(ZOOM_FACTOR, pwr) * (tMin - y);
+	tMax /*document.getElementById("tmax").value*/ = y + Math.pow(ZOOM_FACTOR, pwr) * (tMax - y);
 	update();
 	canv.style.cursor = (pwr > 0 ? "zoom-out" : "zoom-in");
 

@@ -59,19 +59,6 @@
 	<hr>
 	Precision: <input type="button" value="-" onclick="decimals(-1)"><input
 			type="button" value="+" onclick="decimals(1)"><br>
-
-	<div style="display: none;"><!--leftover input elements still used by the JS-->
-		<br>
-		X=displacement, T=time, V=velocity (with respect to c), Lt=light<br>
-		<br>
-		X min: <input type="text" id="xmin" value="-10" pattern="[-.0-9e]+" required> X max:
-				<input type="text" id="xmax" value="10" pattern="[-.0-9e]+" required><br>
-		T min: <input type="text" id="tmin" value="-10" pattern="[-.0-9e]+" required> T max:
-				<input type="text" id="tmax" value="10" pattern="[-.0-9e]+" required><br>
-		&#160&#160&#160ΔX:  &#160&#160&#160ΔT:
-				<!--<input type="text" id="tstep" value="1" pattern="[.0-9]+" required><br>-->
-		<input type="button" value="Update coordinates" onclick="updateCoord()"><br>
-	</div>
 </form>
 <p id="states"></p>
 </div>

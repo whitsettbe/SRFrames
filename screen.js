@@ -25,15 +25,15 @@ relist / load functionality
 //update the bounding coordinates of the canvas window
 function updateCoord()
 {
-	if(parseFloat(document.getElementById("xmin").value) < parseFloat(document.getElementById("xmax").value) &&
+	/*if(parseFloat(document.getElementById("xmin").value) < parseFloat(document.getElementById("xmax").value) &&
 			parseFloat(document.getElementById("tmin").value) < parseFloat(document.getElementById("tmax").value) &&
 			parseFloat(document.getElementById("xstep").value) > 0 &&
-			parseFloat(document.getElementById("tstep").value) > 0)
+			parseFloat(document.getElementById("tstep").value) > 0)*/
 	{
-		xMin = parseFloat(document.getElementById("xmin").value);
+		/*xMin = parseFloat(document.getElementById("xmin").value);
 		xMax = parseFloat(document.getElementById("xmax").value);
 		tMin = parseFloat(document.getElementById("tmin").value);
-		tMax = parseFloat(document.getElementById("tmax").value);
+		tMax = parseFloat(document.getElementById("tmax").value);*/
 		document.getElementById("xstep").value = expRound(Math.pow(10, Math.round(Math.log(
 				scaleIn("x", xMax - xMin) / 2) / Math.log(10)) - 1));
 		document.getElementById("tstep").value = expRound(Math.pow(10, Math.round(Math.log(
@@ -42,10 +42,10 @@ function updateCoord()
 		tStep = parseFloat(document.getElementById("tstep").value);
 		//update();
 	}
-	else
+	/*else
 	{
 		alert("Invalid coordinate values");
-	}
+	}*/
 }
 
 

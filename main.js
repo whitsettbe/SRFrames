@@ -64,13 +64,13 @@ function animate(oldStates, basis, oldBBox, f)
 		states[i] = trans(oldStates[i],
 				[basis[0] * f / FRAMES, basis[1] * f / FRAMES, basis[2] * f / FRAMES]);
 	}
-	document.getElementById("xmin").value =
+	xMin = //document.getElementById("xmin").value =
 			parseFloat(oldBBox[0] - (oldBBox[0] + oldBBox[1]) / 2 * Math.pow(f / FRAMES, 2));
-	document.getElementById("xmax").value =
+	xMax = //document.getElementById("xmax").value =
 			parseFloat(oldBBox[1] - (oldBBox[0] + oldBBox[1]) / 2 * Math.pow(f / FRAMES, 2));
-	document.getElementById("tmin").value =
+	tMin = //document.getElementById("tmin").value =
 			parseFloat(oldBBox[2] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2));
-	document.getElementById("tmax").value =
+	tMax = //document.getElementById("tmax").value =
 			parseFloat(oldBBox[3] - (oldBBox[2] + oldBBox[3]) / 2 * Math.pow(f / FRAMES, 2));
 	update();
 	if(f < FRAMES) setTimeout(function(){animate(oldStates, basis, oldBBox, f + 1);}, FRAME_GAP);
@@ -209,7 +209,7 @@ function redo()
 	}
 }
 
-//process undo / redo / cancel key input
+//process undo / redo / cancel / save / import key input
 document.body.addEventListener('keydown', function(e)
 {
 	//update document history
@@ -226,11 +226,26 @@ document.body.addEventListener('keydown', function(e)
 		if(!document.getElementById("btnRedo").disabled)
 			redo();
 	}
+
 	//call cancel
 	else if(e.key.toLowerCase() == "escape")
 	{
 		e.preventDefault();
 		cancel();
+	}
+
+	//save file
+	else if(e.ctrlKey && e.key.toLowerCase() == "s")
+	{
+		e.preventDefault();
+		fileSave();
+	}
+
+	//import file
+	else if(e.ctrlKey && e.key.toLowerCase() == "o")
+	{
+		e.preventDefault();
+		document.getElementById("import").click();
 	}
 }, false);
 
@@ -254,10 +269,10 @@ function toText()
 function fromText(text)
 {
 	var keys = text.substr(text.lastIndexOf("@\n") + 2).split(/\s+/).reverse();
-	document.getElementById("xmin").value = parseFloat(keys.pop());
-	document.getElementById("xmax").value = parseFloat(keys.pop());
-	document.getElementById("tmin").value = parseFloat(keys.pop());
-	document.getElementById("tmax").value = parseFloat(keys.pop());
+	xMin /*document.getElementById("xmin").value*/ = parseFloat(keys.pop());
+	xMax /*document.getElementById("xmax").value*/ = parseFloat(keys.pop());
+	tMin /*document.getElementById("tmin").value*/ = parseFloat(keys.pop());
+	tMax /*document.getElementById("tmax").value*/ = parseFloat(keys.pop());
 	approxUnits(1 / parseFloat(keys.pop()), 1 / parseFloat(keys.pop()));
 	update();
 	var numFrame = Math.round(parseFloat(keys.pop()));
