@@ -218,7 +218,7 @@ helper fns
 */
 
 var lockIds = "btnImport btnExport exportLink btnTransform btnRemove btnIntersect btnPointTo btnSave btnSaveNew"
-		+ " xUnit tUnit";
+		+ " btnUndo btnRedo xUnit tUnit";
 
 //function to solve linear equations
 function linSolve(x0, y0, m0, x1, y1, m1)

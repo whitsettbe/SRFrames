@@ -209,20 +209,28 @@ function redo()
 	}
 }
 
-//process undo / redo key input
+//process undo / redo / cancel key input
 document.body.addEventListener('keydown', function(e)
 {
 	//update document history
 	if(e.key.toLowerCase() == "z" && e.ctrlKey && !e.shiftKey)
 	{
 		e.preventDefault();
-		undo();
+		if(!document.getElementById("btnUndo").disabled)
+			undo();
 	}
 	else if(e.key.toLowerCase() == "y" && e.ctrlKey && !e.shiftKey
 			|| e.key.toLowerCase() == "z" && e.ctrlKey && e.shiftKey)
 	{
 		e.preventDefault();
-		redo();
+		if(!document.getElementById("btnRedo").disabled)
+			redo();
+	}
+	//call cancel
+	else if(e.key.toLowerCase() == "escape")
+	{
+		e.preventDefault();
+		cancel();
 	}
 }, false);
 
@@ -233,9 +241,9 @@ convert program info to text
 function toText()
 {
 	var text = document.getElementById("notes").value + "@\n";
-	text += xMin + " " + xMax + " " + tMin + " " + tMax + " " + xStep + " " + tStep + "\n";
+	text += xMin + " " + xMax + " " + tMin + " " + tMax + "\n";
 	text += xFactor + " " + tFactor + "\n";
-	text += states.length + "\n";
+	text += states.length + " " + document.getElementById("ref").value + "\n";
 	for(var i = 0; i < states.length; i++)
 		text += (ticks[i] ? 1 : 0) + " " + parseFloat(states[i][0]) + " " + parseFloat(states[i][1]) + " " +
 				parseFloat(states[i][2]) + " " + parseFloat(edits[i][0]) + " " + parseFloat(edits[i][1]) + " " +
@@ -250,11 +258,10 @@ function fromText(text)
 	document.getElementById("xmax").value = parseFloat(keys.pop());
 	document.getElementById("tmin").value = parseFloat(keys.pop());
 	document.getElementById("tmax").value = parseFloat(keys.pop());
-	keys.pop();//document.getElementById("xstep").value = parseFloat(keys.pop());
-	keys.pop();//document.getElementById("tstep").value = parseFloat(keys.pop());
 	approxUnits(1 / parseFloat(keys.pop()), 1 / parseFloat(keys.pop()));
 	update();
 	var numFrame = Math.round(parseFloat(keys.pop()));
+	var refNum = parseInt(keys.pop());
 	states = []; edits = []; ticks = [];
 
 	//get reference frame lines
@@ -274,7 +281,7 @@ function fromText(text)
 	//update notes and refresh
 	document.getElementById("notes").value = text.substr(0, text.lastIndexOf('@'));
 	document.getElementById("import").value = "";
-	update(1);//@@may want to switch to base frame instead of first frame
+	update(refNum);
 	cancel();
 }
 
