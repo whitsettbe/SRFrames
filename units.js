@@ -126,7 +126,7 @@ function unitLoad()
                 units[pack.substring(0, pack.indexOf(" = "))] =
                         units[pack.substring(pack.indexOf(" = ") + 3, pack.indexOf(" / "))] /
                         parseFloat(pack.substring(pack.indexOf(" / ") + 3));
-            splitUnits[block].push(pack.substring(0, pack.indexOf(" = ")));//@@
+            splitUnits[block].push(pack.substring(0, pack.indexOf(" = ")));
         }
         else
         {

@@ -1,5 +1,3 @@
-//@@toFloat needed in file retrieval?
-
 //defining constants
 var DIM = Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.9);
 var PT_RAD = 5;
