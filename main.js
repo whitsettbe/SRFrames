@@ -252,6 +252,8 @@ function toText()
 	var text = document.getElementById("notes").value + "@\n";
 	text += xMin + " " + xMax + " " + tMin + " " + tMax + "\n";
 	text += xFactor + " " + tFactor + "\n";
+	text += (document.getElementById("zoomX").checked ? 1 : 0) + " " +
+			(document.getElementById("zoomT").checked ? 1 : 0) + "\n";
 	text += states.length + " " + document.getElementById("ref").value + "\n";
 	for(var i = 0; i < states.length; i++)
 		text += (ticks[i] ? 1 : 0) + " " + parseFloat(states[i][0]) + " " + parseFloat(states[i][1]) + " " +
@@ -268,6 +270,8 @@ function fromText(text)
 	tMin = parseFloat(keys.pop());
 	tMax = parseFloat(keys.pop());
 	approxUnits(1 / parseFloat(keys.pop()), 1 / parseFloat(keys.pop()));
+	document.getElementById("zoomX").checked = (parseInt(keys.pop()) == 1);
+	document.getElementById("zoomT").checked = (parseInt(keys.pop()) == 1);
 	update();
 	var numFrame = Math.round(parseFloat(keys.pop()));
 	var refNum = parseInt(keys.pop());
