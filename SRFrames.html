@@ -4,22 +4,29 @@
 <title>Interactive Reference Frames</title>
 <link rel="stylesheet" href="srstyle.css">
 </head>
-<body style="font-family: 'Montserrat';background-color: #bbddfc">
-<table>
-	<tr style ="background-color: #ffffff">
-		<td style="vertical-align:top;">
-			<canvas id="myCanvas" width="100" height="100" style="border:1px solid rgb(245, 240, 130); touch-action:none"></canvas>
+<body style = "background-color: red;">
+<table style = "background-color: orange;">
+	<tr style = "background-color: yellow;">
+		<td style="vertical-align:top; background-color: green;" >
+			<canvas id="myCanvas" width="100" height="100" style="border:1px solid; touch-action:none; background-color: blue;"></canvas>
 		</td>
 		<td id="wide" valign="top"></td>
 	</tr>
-	<tr>
+	<tr style = "background-color: purple;">
 		<td id="tall" valign="top"></td>
 		<td></td>
 	</tr>
 </table>
-<div id="temp" rgb(245, 240, 130) style="display: none;">
-<form id="form">
-	<input type="button" value="Import" id="btnImport">
+<div id="temp" style="display: none;">
+<form id="form" style = "font-style: inherit;">
+	<label for= "selection">Make a selection:</label>
+	<select name ="selection" id = "selection">
+	<option type="file" id="import" value="" style="display: none;">Import</option>
+	<option type="button" value="Undo" id="btnUndo">Undo</option>
+	<option type="button" value="Redo" id="btnRedo">Redo</option>
+	<br><br>
+	<input type="submit" value="Submit">
+	<input type="button" value="Import" id="btnImport" style = "background-color: pink;">
 	<input type="file" id="import" value="" style="display: none;">
 	<input type="button" value="Export" id="btnExport" onclick="fileSave()">
 	<a download="refframe.txt.rf" id="exportLink" style="display: none"></a>
@@ -31,7 +38,7 @@
 	<input type="button" id="btnPointTo" value="Aim" onclick="pointTowards()">
 	<input type="button" id="btnSave" value="Edit" onclick="save()"> <input
 			type="button" id="btnSaveNew" value="New" onclick="saveNew()"><br>
-	
+
 	<div id="edits" style="display: none;">
 		<br>
 		X: <input type="text" id="xedit" value="0" pattern="-?(([0-9]+\.?[0-9]*)|(\.[0-9]+))(e(-|\+)?[0-9]+)?" required><br>T: <input
@@ -58,6 +65,7 @@
 	<hr>
 	Precision: <input type="button" value="-" onclick="decimals(-1)"><input
 			type="button" value="+" onclick="decimals(1)"><br>
+
 </form>
 <p id="states"></p>
 </div>
