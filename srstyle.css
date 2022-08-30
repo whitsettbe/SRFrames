@@ -5,8 +5,10 @@ input[type='text'], input[type='number']
 
 input[type='button']
 {
-	border-color: #aaaaaa;
+	border-color: blue;
+	background-color: green;
 	border-style: outset;
+	font-family: inherit;
 }
 
 input:invalid
